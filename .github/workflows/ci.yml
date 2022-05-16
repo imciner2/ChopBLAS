@@ -1,0 +1,30 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    # As of January 19, 2022, the MATLAB action has undocumented support for Windows and MacOS shared runners
+    # (https://github.com/matlab-actions/setup-matlab/issues/18#issuecomment-1006990188). This is in version
+    # 1.1.0 of the action, and only provides the bare Matlab and Simulink products with no toolboxes.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: Install MATLAB
+        uses: matlab-actions/setup-matlab@v1
+
+      - name: Run tests
+        uses: matlab-actions/run-tests@v1
+        with:
+          source-folder: ./
+          select-by-folder: tests
