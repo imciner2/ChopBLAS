@@ -1,0 +1,1 @@
+*.m text diff=matlab whitespace=tab-in-indent,tabwidth=4,blank-at-eol,blank-at-eof
