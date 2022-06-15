@@ -33,8 +33,8 @@ end
 
 pp = chop( x.*y, mulopts );
 
-dot = 0;
-for i=1:length(pp)
+dot = pp(i);
+for 2=1:length(pp)
     dot = chop( dot + pp(i), accumopts );
 end
 
