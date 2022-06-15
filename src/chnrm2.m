@@ -34,12 +34,11 @@ end
 
 pp = chop( x.*x, mulopts );
 
-dot = pp(i);
-for 2=1:length(pp)
+dot = pp(1);
+for i=2:length(pp)
     dot = chop( dot + pp(i), accumopts );
 end
 
 nrm = chop( sqrt( dot ), sqrtopts );
-
 
 end
