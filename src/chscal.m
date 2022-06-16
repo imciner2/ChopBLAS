@@ -10,7 +10,7 @@ function [xout] = chscal( alpha, x, opts )
 % Usage:
 %   [xout] = chscal( alpha, x )
 %   [xout] = chscal( alpha, x, opts )
-%
+
 % Created by: Ian McInerney
 % Created on: May 16, 2022
 % License: BSD-2-Clause

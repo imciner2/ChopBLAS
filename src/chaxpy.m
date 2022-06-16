@@ -20,7 +20,7 @@ function [xout] = chaxpy( alpha, x, y, mulopts, addopts )
 %   [xout] = chaxpy( alpha, x, y )
 %   [xout] = chaxpy( alpha, x, opts )
 %   [xout] = chaxpy( alpha, x, mulopts, addopts )
-%
+
 % Created by: Ian McInerney
 % Created on: June 15, 2022
 % License: BSD-2-Clause

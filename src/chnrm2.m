@@ -18,7 +18,7 @@ function [nrm] = chnrm2( x, mulopts, accumopts, sqrtopts )
 %   [nrm] = chnrm2( x )
 %   [nrm] = chnrm2( x, opts )
 %   [nrm] = chnrm2( x, mulopts, accumopts, sqrtopts )
-%
+
 % Created by: Ian McInerney
 % Created on: May 20, 2022
 % License: BSD-2-Clause

@@ -19,7 +19,7 @@ function [dot] = chdot( x, y, mulopts, accumopts )
 %   [dot] = chdot( x, y )
 %   [dot] = chdot( x, y, opts )
 %   [dot] = chdot( x, y, mulopts, accumopts )
-%
+
 % Created by: Ian McInerney
 % Created on: May 16, 2022
 % License: BSD-2-Clause
