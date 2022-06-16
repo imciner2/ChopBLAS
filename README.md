@@ -22,4 +22,4 @@ This allows for the easy simulation of linear algebra operations/algorithms in l
 
 ## License
 
-This library is licensed under the 2-Clause BSD license, provided inside the `LICENSE` file in this repository.
+This library is licensed under the BSD 2-Clause license, provided inside the `LICENSE` file in this repository.
