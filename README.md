@@ -24,6 +24,7 @@ This allows for the easy simulation of linear algebra operations/algorithms in l
 | Function | Operation                                                             | Description                                                           |
 |----------|:----------------------------------------------------------------------|:----------------------------------------------------------------------|
 | chgemv   | $x_{out} = \alpha A x + \beta y$ or $x_{out} = \alpha A' x + \beta y$ | Compute the matrix-vector product A*x + y                             |
+| chtrmv   | $x_{out} = A x$ or $x_{out} = A' x$                                   | Compute the matrix-vector product A*x for triangular                  |
 
 
 ## License
