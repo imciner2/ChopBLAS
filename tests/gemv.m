@@ -9,6 +9,7 @@ classdef gemv < matlab.unittest.TestCase
 
         Aint
         Adec
+        Aeye
 
         xint
         yint
@@ -32,8 +33,9 @@ classdef gemv < matlab.unittest.TestCase
             yint = testCase.yint;
             ydec = testCase.ydec;
 
-            testCase.Aint = [yint, yint, yint, yint, yint, yint, yint];
+            testCase.Aeye = eye(4);
             testCase.Adec = [ydec, ydec, ydec, ydec];
+            testCase.Aint = [yint, yint, yint, yint, yint, yint, yint];
 
             % Set the default format for chop to double precision (mimic no rounding)
             chop( [], testCase.dopts );
@@ -124,30 +126,29 @@ classdef gemv < matlab.unittest.TestCase
         function accumulate_rounding(testCase)
             alpha = 3;
             beta = 4;
-            A = eye(length(testCase.xdec));
 
             %% Only one precision used
             % No rounding for beta=1
-            z = chgemv( 'n', 1, A, testCase.xdec, 1, testCase.ydec, testCase.hopts );
+            z = chgemv( 'n', 1, testCase.Aeye, testCase.xdec, 1, testCase.ydec, testCase.hopts );
 
             % The specification is that y is preloaded into the output and then accumulated onto
             c = testCase.ydec;
             for i=1:length(c)
-                for j=1:1:size(A,2)
-                    c(i) = chop( c(i) + chop( A(i,j) * testCase.xdec(j), testCase.hopts ), testCase.hopts );
+                for j=1:1:size(testCase.Aeye, 2)
+                    c(i) = chop( c(i) + chop( testCase.Aeye(i,j) * testCase.xdec(j), testCase.hopts ), testCase.hopts );
                 end
             end
 
             testCase.verifyEqual( z, c );
 
             % Rounding for non-unit beta
-            z = chgemv( 'n', 1, A, testCase.xdec, 3, testCase.ydec, testCase.hopts );
+            z = chgemv( 'n', 1, testCase.Aeye, testCase.xdec, 3, testCase.ydec, testCase.hopts );
 
             % The specification is that y is preloaded into the output and then accumulated onto
             c = chop( 3.*testCase.ydec, testCase.hopts );
             for i=1:length(c)
-                for j=1:1:size(A,2)
-                    c(i) = chop( c(i) + chop( A(i,j) * testCase.xdec(j), testCase.hopts ), testCase.hopts );
+                for j=1:1:size(testCase.Aeye, 2)
+                    c(i) = chop( c(i) + chop( testCase.Aeye(i,j) * testCase.xdec(j), testCase.hopts ), testCase.hopts );
                 end
             end
 
@@ -155,26 +156,26 @@ classdef gemv < matlab.unittest.TestCase
 
             %% Two precisions used
             % No rounding for beta=1
-            z = chgemv( 'n', 1, A, testCase.xdec, 1, testCase.ydec, testCase.sopts, testCase.hopts );
+            z = chgemv( 'n', 1, testCase.Aeye, testCase.xdec, 1, testCase.ydec, testCase.sopts, testCase.hopts );
 
             % The specification is that y is preloaded into the output and then accumulated onto
             c = testCase.ydec;
             for i=1:length(c)
-                for j=1:1:size(A,2)
-                    c(i) = chop( c(i) + chop( A(i,j) * testCase.xdec(j), testCase.sopts ), testCase.hopts );
+                for j=1:1:size(testCase.Aeye, 2)
+                    c(i) = chop( c(i) + chop( testCase.Aeye(i,j) * testCase.xdec(j), testCase.sopts ), testCase.hopts );
                 end
             end
 
             testCase.verifyEqual( z, c );
 
             % Rounding for non-unit beta
-            z = chgemv( 'n', 1, A, testCase.xdec, 3, testCase.ydec, testCase.sopts, testCase.hopts );
+            z = chgemv( 'n', 1, testCase.Aeye, testCase.xdec, 3, testCase.ydec, testCase.sopts, testCase.hopts );
 
             % The specification is that y is preloaded into the output with rounding done using mulopts, and then accumulated onto
             c = chop( 3.*testCase.ydec, testCase.sopts );
             for i=1:length(c)
-                for j=1:1:size(A,2)
-                    c(i) = chop( c(i) + chop( A(i,j) * testCase.xdec(j), testCase.sopts ), testCase.hopts );
+                for j=1:1:size(testCase.Aeye, 2)
+                    c(i) = chop( c(i) + chop( testCase.Aeye(i,j) * testCase.xdec(j), testCase.sopts ), testCase.hopts );
                 end
             end
 
@@ -189,34 +190,67 @@ classdef gemv < matlab.unittest.TestCase
             %% Test with no accumulate vector with full precision
             chop( [], testCase.dopts );
 
-            z = chgemv( 'n', alpha, testCase.Aint, testCase.xint, 0, testCase.yint );
-            testCase.verifyEqual( z, (alpha.*(testCase.Aint*testCase.xint) ), 'AbsTol', testCase.tol );
+            z = chgemv( 'n', alpha, testCase.Adec, testCase.xdec, 0, testCase.yint );
+            testCase.verifyEqual( z, (alpha.*(testCase.Adec*testCase.xdec) ), 'AbsTol', testCase.tol );
 
-            z = chgemv( 'n', alpha, testCase.Aint, testCase.xint, 2, [] );
-            testCase.verifyEqual( z, (alpha.*(testCase.Aint*testCase.xint) ), 'AbsTol', testCase.tol );
+            z = chgemv( 'n', alpha, testCase.Adec, testCase.xdec, 2, [] );
+            testCase.verifyEqual( z, (alpha.*(testCase.Adec*testCase.xdec) ), 'AbsTol', testCase.tol );
+
+            z = chgemv( 't', alpha, testCase.Adec, testCase.xdec, 0, testCase.yint );
+            testCase.verifyEqual( z, (alpha.*(testCase.Adec'*testCase.xdec) ), 'AbsTol', testCase.tol );
+
+            z = chgemv( 't', alpha, testCase.Adec, testCase.xdec, 2, [] );
+            testCase.verifyEqual( z, (alpha.*(testCase.Adec'*testCase.xdec) ), 'AbsTol', testCase.tol );
 
             %% Test the rounding in the scaling of the matrix-vector result with one precision
-            A = eye(length(testCase.xdec));
-            z = chgemv( 'n', alpha, A, testCase.xdec, 0, testCase.ydec, testCase.hopts );
+            % Normal matrix
+            z = chgemv( 'n', alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.hopts );
 
             c  = zeros(length(testCase.xdec), 1);
             tx = chop( alpha.*testCase.xdec, testCase.hopts );
             for i=1:length(c)
-                for j=1:1:size(A,2)
-                    c(i) = chop( c(i) + chop( A(i,j) * tx(j), testCase.hopts ), testCase.hopts );
+                for j=1:1:size(testCase.Adec, 2)
+                    c(i) = chop( c(i) + chop( testCase.Adec(i,j) * tx(j), testCase.hopts ), testCase.hopts );
+                end
+            end
+
+            testCase.verifyEqual( z, c );
+
+            % Transposed matrix
+            z = chgemv( 't', alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.hopts );
+
+            c  = zeros(length(testCase.xdec), 1);
+            tx = chop( alpha.*testCase.xdec, testCase.hopts );
+            for i=1:length(c)
+                for j=1:1:size(testCase.Adec,2)
+                    c(i) = chop( c(i) + chop( testCase.Adec(j,i) * tx(j), testCase.hopts ), testCase.hopts );
                 end
             end
 
             testCase.verifyEqual( z, c );
 
             %% Test the rounding in the scaling of the matrix-vector result with two precisions
-            z = chgemv( 'n', alpha, A, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts );
+            % Normal matrix
+            z = chgemv( 'n', alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts );
 
             c = zeros(length(testCase.xdec), 1);
             tx = chop( alpha.*testCase.xdec, testCase.sopts );
             for i=1:length(c)
-                for j=1:1:size(A,2)
-                    c(i) = chop( c(i) + chop( A(i,j) * tx(j), testCase.sopts ), testCase.hopts );
+                for j=1:1:size(testCase.Adec, 2)
+                    c(i) = chop( c(i) + chop( testCase.Adec(i,j) * tx(j), testCase.sopts ), testCase.hopts );
+                end
+            end
+
+            testCase.verifyEqual( z, c );
+
+            % Transposed matrix
+            z = chgemv( 't', alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts );
+
+            c  = zeros(length(testCase.xdec), 1);
+            tx = chop( alpha.*testCase.xdec, testCase.hopts );
+            for i=1:length(c)
+                for j=1:1:size(testCase.Adec,2)
+                    c(i) = chop( c(i) + chop( testCase.Adec(j,i) * tx(j), testCase.sopts ), testCase.hopts );
                 end
             end
 
