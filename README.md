@@ -19,6 +19,12 @@ This allows for the easy simulation of linear algebra operations/algorithms in l
 | chnrm2   | $x_{out} = \lVert x \rVert_{2}$          | Compute the 2-norm of the vector x                                    |
 | chasum   | $x_{out} = \sum_{i} \lvert x_{i} \rvert$ | Compute the sum of the absolute value of the elements of the vector x |
 
+### Level 2
+
+| Function | Operation                                                             | Description                                                           |
+|----------|:----------------------------------------------------------------------|:----------------------------------------------------------------------|
+| chgemv   | $x_{out} = \alpha A x + \beta y$ or $x_{out} = \alpha A' x + \beta y$ | Compute the matrix-vector product A*x + y                             |
+
 
 ## License
 
