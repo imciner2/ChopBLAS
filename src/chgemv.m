@@ -1,10 +1,11 @@
-function [xout] = chgemv( trans, alpha, A, x, beta, y, mulopts, addopts )
+function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 %CHGEMV Perform a matrix-vector product and an addition
 %
 % Perform the matrix-vector computation
-%   xout = alpha*A*x + beta*y   - when trans is `N` or
-%   xout = alpha*A'*x + beta*y  - when trans is `T`
-% where A is a matrix, alpha and beta are scalars, and x and y are vectors.
+%   xout = alpha*A*x + beta*y   - when 'Transpose' is false, or
+%   xout = alpha*A'*x + beta*y  - when 'Transpose' is true
+% where A is a matrix, alpha and beta are scalars, x and y are vectors, and
+% 'Transpose' is an optional argument.
 % If beta is zero or y is empty, then the addition with y is not performed.
 %
 % The order of operations for this function are as follows:
@@ -19,25 +20,38 @@ function [xout] = chgemv( trans, alpha, A, x, beta, y, mulopts, addopts )
 %   * Separate rounding modes for the multiplication and addition
 %     operations.
 %
-% Specifying only opts will use the same rounding mode (given by opts)
-% for both the multiplication and addition operations.
+% Specifying only roundopts will use the same rounding mode (given by
+% roundopts) for both the multiplication and addition operations.
 % Individual rounding modes for the multiplication and addition
 % operations can be specified in the mulopts and addopts arguments,
 % respectively.
 %
 % Usage:
-%   [xout] = chgemv( trans, alpha, A, x, beta, y )
-%   [xout] = chgemv( trans, alpha, A, x, beta, y, opts )
-%   [xout] = chgemv( trans, alpha, A, x, beta, y, mulopts, addopts )
+%   [xout] = chgemv( alpha, A, x, beta, y, ... )
+%   [xout] = chgemv( alpha, A, x, beta, y, roundopts, ... )
+%   [xout] = chgemv( alpha, A, x, beta, y, mulopts, addopts, ... )
 
 % Created by: Ian McInerney
 % Created on: June 16, 2022
 % License: BSD-2-Clause
 
-if nargin < 7
-    mulopts = [];
-    addopts = [];
-elseif nargin < 8
+
+%% Setup the argument parsing
+isboolean = @(x) islogical(x) && isscalar(x);
+p = inputParser;
+p.StructExpand = false;
+addOptional( p, 'mulopts', [] );
+addOptional( p, 'addopts', [] );
+addParameter( p, 'Transpose', false, isboolean );
+
+parse( p, varargin{:} )
+
+mulopts  = p.Results.mulopts;
+addopts  = p.Results.addopts;
+trans    = p.Results.Transpose;
+
+% Allow only the first to be specified and have it be used for both
+if isempty(addopts) && ~isempty(mulopts)
     addopts = mulopts;
 end
 
@@ -58,17 +72,7 @@ elseif alpha ~= 1
     x = chop( alpha.*x, mulopts );
 end
 
-if strcmpi( 'n', trans )
-    % Compute the non-transposed product
-    for i=1:1:size(A,1)
-        A(i,:) = chop( A(i,:).*x', mulopts );
-    end
-
-    for i=1:1:size(A,2)
-        xout = chop( xout + A(:,i), addopts );
-    end
-
-elseif strcmpi( 't', trans )
+if trans
     % Compute the transposed product
     for i=1:1:size(A,2)
         A(:,i) = chop( A(:,i).*x, mulopts );
@@ -77,9 +81,15 @@ elseif strcmpi( 't', trans )
     for i=1:1:size(A,1)
         xout = chop( xout + A(i,:)', addopts );
     end
-
 else
-    error( ['Unknown transpose option: ', trans] );
+    % Compute the non-transposed product
+    for i=1:1:size(A,1)
+        A(i,:) = chop( A(i,:).*x', mulopts );
+    end
+
+    for i=1:1:size(A,2)
+        xout = chop( xout + A(:,i), addopts );
+    end
 end
 
 end
