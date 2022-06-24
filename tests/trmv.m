@@ -52,17 +52,14 @@ classdef trmv < matlab.unittest.TestCase
 
             %% Test the different triangular options
             % Upper-triangular, normal, non-unit triangular matrix
-            z = chtrmv( 'u', 'n', 'n', testCase.Aint, testCase.xint );
+            z = chtrmv( testCase.Aint, testCase.xint );
             testCase.verifyEqual( z, triu( testCase.Aint )*testCase.xint, 'AbsTol', testCase.tol );
 
-            z = chtrmv( 'U', 'n', 'n', testCase.Aint, testCase.xint );
+            z = chtrmv( testCase.Aint, testCase.xint, 'LowerTriangular', false );
             testCase.verifyEqual( z, triu( testCase.Aint )*testCase.xint, 'AbsTol', testCase.tol );
 
             % Lower-triangular, normal, non-unit triangular matrix
-            z = chtrmv( 'l', 'n', 'n', testCase.Aint, testCase.xint );
-            testCase.verifyEqual( z, tril( testCase.Aint )*testCase.xint, 'AbsTol', testCase.tol );
-
-            z = chtrmv( 'L', 'n', 'n', testCase.Aint, testCase.xint );
+            z = chtrmv(testCase.Aint, testCase.xint, 'LowerTriangular', true );
             testCase.verifyEqual( z, tril( testCase.Aint )*testCase.xint, 'AbsTol', testCase.tol );
 
             %% Test the unit-traingular options
@@ -70,24 +67,18 @@ classdef trmv < matlab.unittest.TestCase
             Au(eye(length(Au)) == 1) = 1;
 
             % Upper-triangular, normal, unit triangular matrix
-            z = chtrmv( 'u', 'n', 'u', testCase.Aint, testCase.xint );
-            testCase.verifyEqual( z, triu( Au )*testCase.xint, 'AbsTol', testCase.tol );
-
-            z = chtrmv( 'u', 'n', 'U', testCase.Aint, testCase.xint );
+            z = chtrmv( testCase.Aint, testCase.xint, 'UnitTriangular', true );
             testCase.verifyEqual( z, triu( Au )*testCase.xint, 'AbsTol', testCase.tol );
 
             % Lower-triangular, normal, unit triangular matrix
-            z = chtrmv( 'l', 'n', 'u', testCase.Aint, testCase.xint );
-            testCase.verifyEqual( z, tril( Au )*testCase.xint, 'AbsTol', testCase.tol );
-
-            z = chtrmv( 'l', 'n', 'U', testCase.Aint, testCase.xint );
+            z = chtrmv( testCase.Aint, testCase.xint, 'LowerTriangular', true, 'UnitTriangular', true );
             testCase.verifyEqual( z, tril( Au )*testCase.xint, 'AbsTol', testCase.tol );
         end
 
         %% Test the rounding in the matrix-vector product with only one precision
         function normal_operation_single_precision(testCase)
             % Upper-triangular, not unit-triangular
-            z = chtrmv( 'u', 'n', 'n', testCase.Adec, testCase.xdec, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.hopts );
 
             c = chop( diag( testCase.Adec, 0 ) .* testCase.xdec, testCase.hopts );
             for i=1:length(c)
@@ -101,7 +92,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Upper-triangular, unit-triangular
-            z = chtrmv( 'u', 'n', 'u', testCase.Adec, testCase.xdec, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.hopts, 'UnitTriangular', true );
 
             c = testCase.xdec;
             for i=1:length(c)
@@ -115,7 +106,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Lower-triangular, not unit-triangular
-            z = chtrmv( 'l', 'n', 'n', testCase.Adec, testCase.xdec, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.hopts, 'LowerTriangular', true );
 
             c = chop( diag( testCase.Adec, 0 ) .* testCase.xdec, testCase.hopts );
             for i=1:length(c)
@@ -129,7 +120,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Lower-triangular, unit-triangular
-            z = chtrmv( 'u', 'n', 'u', testCase.Adec, testCase.xdec, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.hopts, 'LowerTriangular', true, 'UnitTriangular', true );
 
             c = testCase.xdec;
             for i=1:length(c)
@@ -144,7 +135,7 @@ classdef trmv < matlab.unittest.TestCase
         %% Test the rounding in the matrix-vector product with two precisions
         function normal_operation_two_precision(testCase)
             % Upper-triangular, not unit-triangular
-            z = chtrmv( 'u', 'n', 'n', testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts );
 
             c = chop( diag( testCase.Adec, 0 ) .* testCase.xdec, testCase.sopts );
             for i=1:length(c)
@@ -158,7 +149,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Upper-triangular, unit-triangular
-            z = chtrmv( 'u', 'n', 'u', testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts, 'UnitTriangular', true );
 
             c = testCase.xdec;
             for i=1:length(c)
@@ -172,7 +163,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Lower-triangular, not unit-triangular
-            z = chtrmv( 'l', 'n', 'n', testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts, 'LowerTriangular', true );
 
             c = chop( diag( testCase.Adec, 0 ) .* testCase.xdec, testCase.sopts );
             for i=1:length(c)
@@ -186,7 +177,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Lower-triangular, unit-triangular
-            z = chtrmv( 'u', 'n', 'u', testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts, 'LowerTriangular', true, 'UnitTriangular', true );
 
             c = testCase.xdec;
             for i=1:length(c)
@@ -205,17 +196,11 @@ classdef trmv < matlab.unittest.TestCase
             chop( [], testCase.dopts );
 
             % Upper-triangular, transposed, non-unit triangular matrix
-            z = chtrmv( 'u', 't', 'n', testCase.Aint, testCase.xint );
-            testCase.verifyEqual( z, triu( testCase.Aint )'*testCase.xint, 'AbsTol', testCase.tol );
-
-            z = chtrmv( 'u', 'T', 'n', testCase.Aint, testCase.xint );
+            z = chtrmv( testCase.Aint, testCase.xint, 'Transpose', true );
             testCase.verifyEqual( z, triu( testCase.Aint )'*testCase.xint, 'AbsTol', testCase.tol );
 
             % Lower-triangular, transposed, non-unit triangular matrix
-            z = chtrmv( 'l', 't', 'n', testCase.Aint, testCase.xint );
-            testCase.verifyEqual( z, tril( testCase.Aint )'*testCase.xint, 'AbsTol', testCase.tol );
-
-            z = chtrmv( 'l', 'T', 'n', testCase.Aint, testCase.xint );
+            z = chtrmv( testCase.Aint, testCase.xint, 'Transpose', true, 'LowerTriangular', true );
             testCase.verifyEqual( z, tril( testCase.Aint )'*testCase.xint, 'AbsTol', testCase.tol );
 
             %% Test the unit-traingular options
@@ -223,24 +208,18 @@ classdef trmv < matlab.unittest.TestCase
             Au(eye(length(Au)) == 1) = 1;
 
             % Upper-triangular, transposed, unit triangular matrix
-            z = chtrmv( 'u', 't', 'u', testCase.Aint, testCase.xint );
-            testCase.verifyEqual( z, triu( Au )'*testCase.xint, 'AbsTol', testCase.tol );
-
-            z = chtrmv( 'u', 't', 'U', testCase.Aint, testCase.xint );
+            z = chtrmv( testCase.Aint, testCase.xint, 'Transpose', true, 'UnitTriangular', true );
             testCase.verifyEqual( z, triu( Au )'*testCase.xint, 'AbsTol', testCase.tol );
 
             % Lower-triangular, transposed, unit triangular matrix
-            z = chtrmv( 'l', 't', 'u', testCase.Aint, testCase.xint );
-            testCase.verifyEqual( z, tril( Au )'*testCase.xint, 'AbsTol', testCase.tol );
-
-            z = chtrmv( 'l', 't', 'U', testCase.Aint, testCase.xint );
+            z = chtrmv( testCase.Aint, testCase.xint, 'LowerTriangular', true, 'Transpose', true, 'UnitTriangular', true );
             testCase.verifyEqual( z, tril( Au )'*testCase.xint, 'AbsTol', testCase.tol );
         end
 
         %% Test the rounding in the matrix-vector product with only one precision
         function transposed_operation_single_precision(testCase)
             % Upper-triangular, not unit-triangular
-            z = chtrmv( 'u', 't', 'n', testCase.Adec, testCase.xdec, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.hopts, 'Transpose', true );
 
             c = chop( diag( testCase.Adec, 0 ) .* testCase.xdec, testCase.hopts );
             for i=1:length(c)
@@ -254,7 +233,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Upper-triangular, unit-triangular
-            z = chtrmv( 'u', 't', 'u', testCase.Adec, testCase.xdec, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.hopts, 'Transpose', true, 'UnitTriangular', true );
 
             c = testCase.xdec;
             for i=1:length(c)
@@ -268,7 +247,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Lower-triangular, not unit-triangular
-            z = chtrmv( 'l', 't', 'n', testCase.Adec, testCase.xdec, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.hopts, 'Transpose', true, 'LowerTriangular', true );
 
             c = chop( diag( testCase.Adec, 0 ) .* testCase.xdec, testCase.hopts );
             for i=1:length(c)
@@ -282,7 +261,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Lower-triangular, unit-triangular
-            z = chtrmv( 'u', 't', 'u', testCase.Adec, testCase.xdec, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.hopts, 'Transpose', true, 'LowerTriangular', true, 'UnitTriangular', true );
 
             c = testCase.xdec;
             for i=1:length(c)
@@ -297,7 +276,7 @@ classdef trmv < matlab.unittest.TestCase
         %% Test the rounding in the matrix-vector product with two precisions
         function transposed_operation_two_precision(testCase)
             % Upper-triangular, not unit-triangular
-            z = chtrmv( 'u', 't', 'n', testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts, 'Transpose', true );
 
             c = chop( diag( testCase.Adec, 0 ) .* testCase.xdec, testCase.sopts );
             for i=1:length(c)
@@ -311,7 +290,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Upper-triangular, unit-triangular
-            z = chtrmv( 'u', 't', 'u', testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts, 'Transpose', true, 'UnitTriangular', true );
 
             c = testCase.xdec;
             for i=1:length(c)
@@ -325,7 +304,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Lower-triangular, not unit-triangular
-            z = chtrmv( 'l', 't', 'n', testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts, 'Transpose', true, 'LowerTriangular', true );
 
             c = chop( diag( testCase.Adec, 0 ) .* testCase.xdec, testCase.sopts );
             for i=1:length(c)
@@ -339,7 +318,7 @@ classdef trmv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Lower-triangular, unit-triangular
-            z = chtrmv( 'u', 't', 'u', testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts );
+            z = chtrmv( testCase.Adec, testCase.xdec, testCase.sopts, testCase.hopts, 'Transpose', true, 'LowerTriangular', true, 'UnitTriangular', true );
 
             c = testCase.xdec;
             for i=1:length(c)
