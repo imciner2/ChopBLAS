@@ -6,7 +6,7 @@ function [xout] = chtrmv( A, x, varargin )
 %   xout = A'*x  - when 'Transpose' is true
 % where A is a triangular matrix and x is a vector.
 %
-% Three optional boolean name-value pairs can be provided:
+% Four optional boolean name-value pairs can be provided:
 %   * 'LowerTriangular' - If true the matrix A is lower triangular, false means upper triangular
 %                         Default: false
 %   * 'Transpose'       - If true, the computation is A'*x instead of A*x
@@ -14,6 +14,10 @@ function [xout] = chtrmv( A, x, varargin )
 %   * 'UnitTriangular'  - If true, the matrix A is assumed to be unit triangular
 %                         (1 on the main diagonal) and the main diagonal isn't used.
 %                         Default: false
+%   * 'Rounding'        - Function handle to the function that will perform the rounding operation.
+%                         For more information on the interface 'roundfunc' must present, see the
+%                         ChopBlas documentation.
+%                         Default: @chop
 %
 % The order of operations for this function are as follows:
 %   1) Populate xout with the diagonal multiplication
@@ -45,19 +49,21 @@ function [xout] = chtrmv( A, x, varargin )
 isboolean = @(x) islogical(x) && isscalar(x);
 p = inputParser;
 p.StructExpand = false;
-addOptional( p, 'mulopts', [] );
-addOptional( p, 'addopts', [] );
+addOptional( p, 'mulopts', struct );
+addOptional( p, 'addopts', struct );
 addParameter( p, 'LowerTriangular', false, isboolean );
 addParameter( p, 'Transpose', false, isboolean );
 addParameter( p, 'UnitTriangular', false, isboolean );
+addParameter( p, 'Rounding', @chop );
 
 parse( p, varargin{:} )
 
-mulopts  = p.Results.mulopts;
-addopts  = p.Results.addopts;
-trans    = p.Results.Transpose;
-lowertri = p.Results.LowerTriangular;
-unitdiag = p.Results.UnitTriangular;
+mulopts   = p.Results.mulopts;
+addopts   = p.Results.addopts;
+trans     = p.Results.Transpose;
+lowertri  = p.Results.LowerTriangular;
+unitdiag  = p.Results.UnitTriangular;
+roundfunc = p.Results.Rounding;
 
 % Allow only the first to be specified and have it be used for both
 if isempty(addopts) && ~isempty(mulopts)
@@ -68,7 +74,7 @@ end
 if unitdiag
     xout = x;
 else
-    xout = chop( diag( A, 0 ).*x, mulopts );
+    xout = roundfunc( diag( A, 0 ).*x, mulopts );
 end
 
 [nr, nc] = size(A);
@@ -80,18 +86,18 @@ if trans
         for i=2:1:nr
             % The diagonal elements are already in xout, so skip them (and the last column)
             r = 1:1:(i-1);
-            t = chop( A(i, r)*x(i), mulopts );
+            t = roundfunc( A(i, r)*x(i), mulopts );
 
-            xout(r) = chop( xout(r) + t', addopts );
+            xout(r) = roundfunc( xout(r) + t', addopts );
         end
     else
         % Compute the transposed upper-triangular product
         for i=1:1:(nr-1)
             % The diagonal elements are already in xout, so skip them (and the first column)
             r = (i+1):1:nc;
-            t = chop( A(i, r)*x(i), mulopts );
+            t = roundfunc( A(i, r)*x(i), mulopts );
 
-            xout(r) = chop( xout(r) + t', addopts );
+            xout(r) = roundfunc( xout(r) + t', addopts );
         end
     end
 else
@@ -100,18 +106,18 @@ else
         for i=1:1:(nc-1)
             % The diagonal elements are already in xout, so skip them (and the last column)
             r = (i+1):1:nr;
-            t = chop( A(r,i)*x(i), mulopts );
+            t = roundfunc( A(r,i)*x(i), mulopts );
 
-            xout(r) = chop( xout(r) + t, addopts );
+            xout(r) = roundfunc( xout(r) + t, addopts );
         end
     else
         % Compute the non-transposed upper-triangular product
         for i=2:1:nc
             % The diagonal elements are already in xout, so skip them (and the first column)
             r = 1:1:(i-1);
-            t = chop( A(r, i)*x(i), mulopts );
+            t = roundfunc( A(r, i)*x(i), mulopts );
 
-            xout(r) = chop( xout(r) + t, addopts );
+            xout(r) = roundfunc( xout(r) + t, addopts );
         end
 
 %        for i=1:1:nr

@@ -8,6 +8,14 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 % 'Transpose' is an optional argument.
 % If beta is zero or y is empty, then the addition with y is not performed.
 %
+% Two optional boolean name-value pairs can be provided:
+%   * 'Transpose'       - If true, the computation is A'*x instead of A*x
+%                         Default: false
+%   * 'Rounding'        - Function handle to the function that will perform the rounding operation.
+%                         For more information on the interface 'roundfunc' must present, see the
+%                         ChopBlas documentation.
+%                         Default: @chop
+%
 % The order of operations for this function are as follows:
 %   1) Populate xout with the y vector
 %      If beta==1, then no multiplication/rounding is done
@@ -25,7 +33,7 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 % Individual rounding modes for the multiplication and addition
 % operations can be specified in the mulopts and addopts arguments,
 % respectively.
-%
+
 % Usage:
 %   [xout] = chgemv( alpha, A, x, beta, y, ... )
 %   [xout] = chgemv( alpha, A, x, beta, y, roundopts, ... )
@@ -40,15 +48,17 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 isboolean = @(x) islogical(x) && isscalar(x);
 p = inputParser;
 p.StructExpand = false;
-addOptional( p, 'mulopts', [] );
-addOptional( p, 'addopts', [] );
+addOptional( p, 'mulopts', struct );
+addOptional( p, 'addopts', struct );
 addParameter( p, 'Transpose', false, isboolean );
+addParameter( p, 'Rounding', @chop );
 
 parse( p, varargin{:} )
 
-mulopts  = p.Results.mulopts;
-addopts  = p.Results.addopts;
-trans    = p.Results.Transpose;
+mulopts   = p.Results.mulopts;
+addopts   = p.Results.addopts;
+trans     = p.Results.Transpose;
+roundfunc = p.Results.Rounding;
 
 % Allow only the first to be specified and have it be used for both
 if isempty(addopts) && ~isempty(mulopts)
@@ -59,7 +69,7 @@ end
 if ( beta == 1 ) && ( ~isempty(y) )
     xout = y;
 elseif ( beta ~= 0 ) && ( ~isempty(y) )
-    xout = chop( beta.*y, mulopts );
+    xout = roundfunc( beta.*y, mulopts );
 else
     xout = zeros(length(x), 1);
 end
@@ -69,26 +79,26 @@ if alpha == 0
     return;
 elseif alpha ~= 1
     % Apply the scaling on the matrix-vector product
-    x = chop( alpha.*x, mulopts );
+    x = roundfunc( alpha.*x, mulopts );
 end
 
 if trans
     % Compute the transposed product
     for i=1:1:size(A,2)
-        A(:,i) = chop( A(:,i).*x, mulopts );
+        A(:,i) = roundfunc( A(:,i).*x, mulopts );
     end
 
     for i=1:1:size(A,1)
-        xout = chop( xout + A(i,:)', addopts );
+        xout = roundfunc( xout + A(i,:)', addopts );
     end
 else
     % Compute the non-transposed product
     for i=1:1:size(A,1)
-        A(i,:) = chop( A(i,:).*x', mulopts );
+        A(i,:) = roundfunc( A(i,:).*x', mulopts );
     end
 
     for i=1:1:size(A,2)
-        xout = chop( xout + A(:,i), addopts );
+        xout = roundfunc( xout + A(:,i), addopts );
     end
 end
 
