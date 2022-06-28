@@ -48,7 +48,7 @@ if isempty(addopts) && ~isempty(mulopts)
     addopts = mulopts;
 end
 
-xout = chop( alpha.*x, mulopts );
-xout = chop( xout+y, addopts );
+xout = roundfunc( alpha.*x, mulopts );
+xout = roundfunc( xout+y, addopts );
 
 end
