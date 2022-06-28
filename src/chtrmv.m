@@ -49,8 +49,8 @@ function [xout] = chtrmv( A, x, varargin )
 isboolean = @(x) islogical(x) && isscalar(x);
 p = inputParser;
 p.StructExpand = false;
-addOptional( p, 'mulopts', struct );
-addOptional( p, 'addopts', struct );
+addOptional( p, 'mulopts', [] );
+addOptional( p, 'addopts', [] );
 addParameter( p, 'LowerTriangular', false, isboolean );
 addParameter( p, 'Transpose', false, isboolean );
 addParameter( p, 'UnitTriangular', false, isboolean );
