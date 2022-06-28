@@ -5,6 +5,14 @@ classdef dot < matlab.unittest.TestCase
         sopts
         hopts
         dopts
+
+        rf
+
+        xint
+        yint
+        xdec
+        ydec
+
         tol
     end
 
@@ -14,8 +22,18 @@ classdef dot < matlab.unittest.TestCase
             testCase.hopts.format = 'h';
             testCase.dopts.format = 'd';
 
-            % Set the default format for chop to double precision (mimic no rounding)
-            chop( [], testCase.dopts );
+            % Choose the rounding function to use
+            if strcmpi( getenv('CHOPBLAS_ROUND_FUNC'), 'cpfloat' )
+                testCase.rf = @cpfloat;
+            else
+                % Default to chop
+                testCase.rf = @chop;
+            end
+
+            testCase.xint = [1; 2; 3; 4; 5; -3; -2];
+            testCase.yint = [2; 3; 4; 5; 6;  7;  8];
+            testCase.xdec = [1.0005; 2.34; 3.24; 4];
+            testCase.ydec = [2.00125; 3.00225; 4.00014; 5.0025];
 
             % Set a tolerance for all the tests
             testCase.tol = 1e-4;
@@ -23,30 +41,35 @@ classdef dot < matlab.unittest.TestCase
     end
 
     methods(Test)
-        %% Test the chop-based rounding methods
-
         % No options specified, use global default of the double mode
         function chop_no_opts(testCase)
-            x = [1; 2; 3; 4; 5; -3; -2];
-            y = [2; 3; 4; 5; 6;  7;  8];
+            testCase.rf( [], testCase.dopts );
 
+            % Test with global rounding options
+            z = chdot( testCase.xint, testCase.yint, 'Rounding', testCase.rf );
+            testCase.verifyEqual( z, testCase.xint'*testCase.yint );
+        end
+
+        % Use custom rounding function
+        function chop_round_func(testCase)
+            % Test with default of chop
             chop( [], testCase.dopts );
 
-            z = chdot( x, y );
+            z = chdot( testCase.xint, testCase.yint );
+            testCase.verifyEqual( z, testCase.xint'*testCase.yint );
 
-            testCase.verifyEqual( z, x'*y );
+            % Test with trivial rounding function
+            z = chdot( testCase.xint, testCase.yint, 'Rounding', @(x, y) zeros(length(x), 1) );
+            testCase.verifyEqual( z, 0 );
         end
 
         % Only one mode specified, it is used in both operations
         function chop_one_mode(testCase)
-            x = [1.0005; 2.34; 3.24; 4];
-            y = [2.00125; 3.00225; 4.00014; 5.0025];
-
-            z = chdot( x, y, testCase.hopts );
+            z = chdot( testCase.xdec, testCase.ydec, testCase.hopts, 'Rounding', testCase.rf );
 
             c = 0;
-            for i=1:length(x)
-                c = chop( c + chop( x(i) * y(i), testCase.hopts ), testCase.hopts );
+            for i=1:length(testCase.xdec)
+                c = testCase.rf( c + chop( testCase.xdec(i) * testCase.ydec(i), testCase.hopts ), testCase.hopts );
             end
 
             testCase.verifyEqual( z, c );
@@ -54,14 +77,11 @@ classdef dot < matlab.unittest.TestCase
 
         % Two modes specified, each operation has a different mode
         function chop_two_modes(testCase)
-            x = [1.0005; 2.34; 3.24; 4];
-            y = [2.00125; 3.00225; 4.00014; 5.0025];
-
-            z = chdot( x, y, testCase.sopts, testCase.hopts );
+            z = chdot( testCase.xdec, testCase.ydec, testCase.sopts, testCase.hopts, 'Rounding', testCase.rf );
 
             c = 0;
-            for i=1:length(x)
-                c = chop( c + chop( x(i) * y(i), testCase.sopts ), testCase.hopts );
+            for i=1:length(testCase.xdec)
+                c = testCase.rf( c + testCase.rf( testCase.xdec(i) * testCase.ydec(i), testCase.sopts ), testCase.hopts );
             end
 
             testCase.verifyEqual( z, c );
