@@ -48,8 +48,8 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 isboolean = @(x) islogical(x) && isscalar(x);
 p = inputParser;
 p.StructExpand = false;
-addOptional( p, 'mulopts', [] );
-addOptional( p, 'addopts', [] );
+addOptional( p, 'mulopts', struct([]) );
+addOptional( p, 'addopts', struct([]) );
 addParameter( p, 'Transpose', false, isboolean );
 addParameter( p, 'Rounding', @chop );
 
