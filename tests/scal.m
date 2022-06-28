@@ -2,16 +2,26 @@ classdef scal < matlab.unittest.TestCase
 %SCAL Unit tests for the xSCAL class of functions
 
     properties
-        options
+        hopts
+        dopts
+
+        rf
+
         tol
     end
 
     methods(TestMethodSetup)
         function setup_test(testCase)
-            testCase.options.format = 's';
+            testCase.hopts.format = 'h';
+            testCase.dopts.format = 'd';
 
-            % Set the default format for chop to half precision
-            chop( [], testCase.options );
+            % Choose the rounding function to use
+            if strcmpi( getenv('CHOPBLAS_ROUND_FUNC'), 'cpfloat' )
+                testCase.rf = @cpfloat;
+            else
+                % Default to chop
+                testCase.rf = @chop;
+            end
 
             % Set a tolerance for all the tests
             testCase.tol = 1e-4;
@@ -24,18 +34,34 @@ classdef scal < matlab.unittest.TestCase
             alpha = 2;
             x = [1, 2, 3, 4, 5, -3, -2];
 
-            y = chscal( alpha, x );
+            % Set the default format for chop to double precision
+            testCase.rf( [], testCase.dopts );
+
+            y = chscal( alpha, x, 'Rounding', testCase.rf );
 
             testCase.verifyEqual( y, 2.*x );
+        end
+
+        function chop_round_func(testCase)
+            alpha = 2;
+            x = [1, 2, 3, 4, 5, -3, -2];
+
+            % Test the default rounder using chop
+            chop( [], testCase.dopts );
+
+            y = chscal( alpha, x );
+            testCase.verifyEqual( y, 2.*x );
+
+            % Test a trivial rounding function
+            y = chscal( alpha, x, 'Rounding', @(x, y) zeros(length(x), 1) );
+            testCase.verifyEqual( y, zeros(length(x), 1) );
         end
 
         function chop_opts(testCase)
             alpha = 20000;
             x = [1, 2, -2, 20, 30];
 
-            opts.format = 'h';
-
-            y = chscal( alpha, x, opts );
+            y = chscal( alpha, x, testCase.hopts, 'Rounding', testCase.rf );
 
             testCase.verifyEqual( y, [20000, 40000, -40000, Inf, Inf] );
         end
