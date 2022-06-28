@@ -6,7 +6,7 @@ function [xout] = chtrmv( A, x, varargin )
 %   xout = A'*x  - when 'Transpose' is true
 % where A is a triangular matrix and x is a vector.
 %
-% Four optional boolean name-value pairs can be provided:
+% This function supports the following optional name-value arguments
 %   * 'LowerTriangular' - If true the matrix A is lower triangular, false means upper triangular
 %                         Default: false
 %   * 'Transpose'       - If true, the computation is A'*x instead of A*x
@@ -37,9 +37,9 @@ function [xout] = chtrmv( A, x, varargin )
 % respectively.
 %
 % Usage:
-%   [xout] = chtrmv( A, x, ... )
-%   [xout] = chtrmv( A, x, roundopts, ... )
-%   [xout] = chtrmv( A, x, mulopts, addopts, ... )
+%   [xout] = CHTRMV( A, x, ... )
+%   [xout] = CHTRMV( A, x, roundopts, ... )
+%   [xout] = CHTRMV( A, x, mulopts, addopts, ... )
 
 % Created by: Ian McInerney
 % Created on: June 23, 2022

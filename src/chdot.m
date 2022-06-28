@@ -1,41 +1,58 @@
-function [dot] = chdot( x, y, mulopts, accumopts )
-%CHDOT Compute the chopped dot product between x and y
+function [dot] = chdot( x, y, varargin )
+%CHDOT Compute the dot product between x and y with operation-level rounding
 %
 % Compute the dot product between the vectors x and y with rounding
-% of each operation performed by the chop function.
+% of each operation.
+%
+% This function supports the following optional name-value arguments:
+%   * 'Rounding' - Function handle to the function that will perform the rounding operation.
+%                  For more information on the interface 'roundfunc' must present, see the
+%                  ChopBlas documentation.
+%                  Default: @chop
 %
 % Two configurations for rounding are supported:
 %   * One rounding mode.
-%   * Separate rounding modes for the multiplication and accumulation
+%   * Separate rounding modes for the multiplication and addition
 %     operations.
 %
 % Specifying only opts will use the same rounding mode (given by opts)
-% for both the multiplication and accumulation operations.
-% Individual rounding modes for the multiplication and accumulation
-% operations can be specified in the mulopts and accumopts arguments,
+% for both the multiplication and addition operations.
+% Individual rounding modes for the multiplication and addition
+% operations can be specified in the mulopts and addopts arguments,
 % respectively.
 %
 % Usage:
-%   [dot] = chdot( x, y )
-%   [dot] = chdot( x, y, opts )
-%   [dot] = chdot( x, y, mulopts, accumopts )
+%   [dot] = CHDOT( x, y, ... )
+%   [dot] = CHDOT( x, y, opts, ... )
+%   [dot] = CHDOT( x, y, mulopts, addopts, ... )
 
 % Created by: Ian McInerney
 % Created on: May 16, 2022
 % License: BSD-2-Clause
 
-if nargin < 3
-    mulopts = [];
-    accumopts = [];
-elseif nargin < 4
-    accumopts = mulopts;
+%% Setup the argument parsing
+p = inputParser;
+p.StructExpand = false;
+addOptional( p, 'mulopts', struct([]) );
+addOptional( p, 'addopts', struct([]) );
+addParameter( p, 'Rounding', @chop );
+
+parse( p, varargin{:} )
+
+mulopts   = p.Results.mulopts;
+addopts   = p.Results.addopts;
+roundfunc = p.Results.Rounding;
+
+% Allow only the first to be specified and have it be used for both
+if isempty(addopts) && ~isempty(mulopts)
+    addopts = mulopts;
 end
 
-pp = chop( x.*y, mulopts );
+pp = roundfunc( x.*y, mulopts );
 
 dot = pp(1);
 for i=2:length(pp)
-    dot = chop( dot + pp(i), accumopts );
+    dot = roundfunc( dot + pp(i), addopts );
 end
 
 end

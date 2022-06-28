@@ -1,5 +1,5 @@
 function [xout] = chgemv( alpha, A, x, beta, y, varargin )
-%CHGEMV Perform a matrix-vector product and an addition
+%CHGEMV Perform a matrix-vector product and an addition with operation-level rounding
 %
 % Perform the matrix-vector computation
 %   xout = alpha*A*x + beta*y   - when 'Transpose' is false, or
@@ -8,7 +8,7 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 % 'Transpose' is an optional argument.
 % If beta is zero or y is empty, then the addition with y is not performed.
 %
-% Two optional boolean name-value pairs can be provided:
+% This function supports the following optional name-value arguments
 %   * 'Transpose'       - If true, the computation is A'*x instead of A*x
 %                         Default: false
 %   * 'Rounding'        - Function handle to the function that will perform the rounding operation.
@@ -35,9 +35,9 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 % respectively.
 
 % Usage:
-%   [xout] = chgemv( alpha, A, x, beta, y, ... )
-%   [xout] = chgemv( alpha, A, x, beta, y, roundopts, ... )
-%   [xout] = chgemv( alpha, A, x, beta, y, mulopts, addopts, ... )
+%   [xout] = CHGEMV( alpha, A, x, beta, y, ... )
+%   [xout] = CHGEMV( alpha, A, x, beta, y, roundopts, ... )
+%   [xout] = CHGEMV( alpha, A, x, beta, y, mulopts, addopts, ... )
 
 % Created by: Ian McInerney
 % Created on: June 16, 2022

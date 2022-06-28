@@ -1,9 +1,14 @@
-function [xout] = chaxpy( alpha, x, y, mulopts, addopts )
-%CHAXPY Add the scaled vector x to the vector y
+function [xout] = chaxpy( alpha, x, y, varargin )
+%CHAXPY Add the scaled vector x to the vector y with operation-level rounding
 %
 % Scale each element of the vector x by the scale factor alpha then add
-% the result to the elements in vector y with rounding using chop after
-% each operations.
+% the result to the elements in vector y with rounding after each operation.
+%
+% This function supports the following optional name-value arguments:
+%   * 'Rounding' - Function handle to the function that will perform the rounding operation.
+%                  For more information on the interface 'roundfunc' must present, see the
+%                  ChopBlas documentation.
+%                  Default: @chop
 %
 % Two configurations for rounding are supported:
 %   * One rounding mode.
@@ -17,18 +22,29 @@ function [xout] = chaxpy( alpha, x, y, mulopts, addopts )
 % respectively.
 %
 % Usage:
-%   [xout] = chaxpy( alpha, x, y )
-%   [xout] = chaxpy( alpha, x, opts )
-%   [xout] = chaxpy( alpha, x, mulopts, addopts )
+%   [xout] = CHAXPY( alpha, x, y, ... )
+%   [xout] = CHAXPY( alpha, x, opts, ... )
+%   [xout] = CHAXPY( alpha, x, mulopts, addopts, ... )
 
 % Created by: Ian McInerney
 % Created on: June 15, 2022
 % License: BSD-2-Clause
 
-if nargin < 4
-    mulopts = [];
-    addopts = [];
-elseif nargin < 5
+%% Setup the argument parsing
+p = inputParser;
+p.StructExpand = false;
+addOptional( p, 'mulopts', struct([]) );
+addOptional( p, 'addopts', struct([]) );
+addParameter( p, 'Rounding', @chop );
+
+parse( p, varargin{:} )
+
+mulopts   = p.Results.mulopts;
+addopts   = p.Results.addopts;
+roundfunc = p.Results.Rounding;
+
+% Allow only the first to be specified and have it be used for both
+if isempty(addopts) && ~isempty(mulopts)
     addopts = mulopts;
 end
 
