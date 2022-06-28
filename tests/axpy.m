@@ -5,6 +5,15 @@ classdef axpy < matlab.unittest.TestCase
         sopts
         hopts
         dopts
+
+        rf
+
+        xint
+        yint
+        xdec
+        ydec
+        alpha
+
         tol
     end
 
@@ -14,8 +23,18 @@ classdef axpy < matlab.unittest.TestCase
             testCase.hopts.format = 'h';
             testCase.dopts.format = 'd';
 
-            % Set the default format for chop to double precision (mimic no rounding)
-            chop( [], testCase.dopts );
+            if strcmpi( getenv('CHOPBLAS_ROUND_FUNC'), 'cpfloat' )
+                testCase.rf = @cpfloat;
+            else
+                % Default to chop
+                testCase.rf = @chop;
+            end
+
+            testCase.xint = [1; 2; 3; 4; 5; -3; -2];
+            testCase.yint = [2; 3; 4; 5; 6;  7;  8];
+            testCase.xdec = [1.0005; 2.34; 3.24; 4];
+            testCase.ydec = [2.00125; 3.00225; 4.00014; 5.0025];
+            testCase.alpha = 3;
 
             % Set a tolerance for all the tests
             testCase.tol = 1e-4;
@@ -23,32 +42,35 @@ classdef axpy < matlab.unittest.TestCase
     end
 
     methods(Test)
-        %% Test the chop-based rounding methods
-
         % No options specified, use global default of the double mode
         function chop_no_opts(testCase)
-            x = [1; 2; 3; 4; 5; -3; -2];
-            y = [2; 3; 4; 5; 6;  7;  8];
-            alpha = 3;
+            testCase.rf( [], testCase.dopts );
 
+            % Use the provided rounding function
+            z = chaxpy( testCase.alpha, testCase.xint, testCase.yint, 'Rounding', testCase.rf );
+            testCase.verifyEqual( z, (testCase.alpha.*testCase.xint) + testCase.yint );
+        end
+
+        % Specify the rounding function
+        function chop_round_func(testCase)
+            % Use the default rounding function (chop)
             chop( [], testCase.dopts );
 
-            z = chaxpy( alpha, x, y );
+            z = chaxpy( testCase.alpha, testCase.xint, testCase.yint );
+            testCase.verifyEqual( z, (testCase.alpha.*testCase.xint) + testCase.yint );
 
-            testCase.verifyEqual( z, (alpha.*x) + y );
+            % Test a trivial rounding function to ensure it overrides it
+            z = chaxpy( testCase.alpha, testCase.xint, testCase.yint, 'Rounding', @(x, y) zeros(length(x), 1) );
+            testCase.verifyEqual( z, zeros(length(testCase.xint), 1) );
         end
 
         % Only one mode specified, it is used in both operations
         function chop_one_mode(testCase)
-            x = [1.0005; 2.34; 3.24; 4];
-            y = [2.00125; 3.00225; 4.00014; 5.0025];
-            alpha = 3;
+            z = chaxpy( testCase.alpha, testCase.xdec, testCase.ydec, testCase.hopts, 'Rounding', testCase.rf );
 
-            z = chaxpy( alpha, x, y, testCase.hopts );
-
-            c = zeros(length(x), 1);
-            for i=1:length(x)
-                c(i) = chop( chop( alpha * x(i), testCase.hopts ) + y(i), testCase.hopts );
+            c = zeros(length(testCase.xdec), 1);
+            for i=1:length(testCase.xdec)
+                c(i) = testCase.rf( testCase.rf( testCase.alpha * testCase.xdec(i), testCase.hopts ) + testCase.ydec(i), testCase.hopts );
             end
 
             testCase.verifyEqual( z, c );
@@ -56,15 +78,11 @@ classdef axpy < matlab.unittest.TestCase
 
         % Two modes specified, each operation has a different mode
         function chop_two_modes(testCase)
-            x = [1.0005; 2.34; 3.24; 4];
-            y = [2.00125; 3.00225; 4.00014; 5.0025];
-            alpha = 3;
+            z = chaxpy( testCase.alpha, testCase.xdec, testCase.ydec, testCase.sopts, testCase.hopts, 'Rounding', testCase.rf );
 
-            z = chaxpy( alpha, x, y, testCase.sopts, testCase.hopts );
-
-            c = zeros(length(x), 1);
-            for i=1:length(x)
-                c(i) = chop( chop( alpha * x(i), testCase.sopts ) + y(i), testCase.hopts );
+            c = zeros(length(testCase.xdec), 1);
+            for i=1:length(testCase.xdec)
+                c(i) = testCase.rf( testCase.rf( testCase.alpha * testCase.xdec(i), testCase.sopts ) + testCase.ydec(i), testCase.hopts );
             end
 
             testCase.verifyEqual( z, c );
