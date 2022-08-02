@@ -96,7 +96,7 @@ classdef gemv < matlab.unittest.TestCase
             %% Test with default rounding function
             chop( [], testCase.dopts );
 
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.yint );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Adec*testCase.xdec) ), 'AbsTol', testCase.tol );
 
             % Test with trivial rounding function
@@ -197,13 +197,13 @@ classdef gemv < matlab.unittest.TestCase
             %% Test with no accumulate vector with full precision
             testCase.rf( [], testCase.dopts );
 
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.yint, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, 'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Adec*testCase.xdec) ), 'AbsTol', testCase.tol );
 
             z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 2, [], 'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Adec*testCase.xdec) ), 'AbsTol', testCase.tol );
 
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.yint, 'Transpose', true, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, 'Transpose', true, 'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Adec'*testCase.xdec) ), 'AbsTol', testCase.tol );
 
             z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 2, [], 'Transpose', true, 'Rounding', testCase.rf );
