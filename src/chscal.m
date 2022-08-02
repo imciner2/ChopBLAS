@@ -32,6 +32,10 @@ parse( p, varargin{:} )
 opts   = p.Results.opts;
 roundfunc = p.Results.Rounding;
 
+if ~isscalar( alpha )
+    error( "chscal:AlphaMustBeScalar", "alpha must be a scalar." );
+end
+
 xout = roundfunc( alpha.*x, opts );
 
 end

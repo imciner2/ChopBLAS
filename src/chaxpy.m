@@ -48,6 +48,18 @@ if isempty(addopts) && ~isempty(mulopts)
     addopts = mulopts;
 end
 
+% Verify arguments
+sx = size( x );
+sy = size( y );
+
+if ~isscalar( alpha )
+    error( "chaxpy:AlphaMustBeScalar", "alpha must be a scalar." );
+end
+if ~( all( sx == sy ) )
+    error( "chaxpy:xyMustBeSameSize", "The x and y vectors must be the same size." );
+end
+
+% Perform the computations
 xout = roundfunc( alpha.*x, mulopts );
 xout = roundfunc( xout+y, addopts );
 

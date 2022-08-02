@@ -38,8 +38,10 @@ classdef scal < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );
 
             y = chscal( alpha, x, 'Rounding', testCase.rf );
-
             testCase.verifyEqual( y, 2.*x );
+
+            % Alpha not a scalar
+            testCase.verifyError( @() chscal( [2; 2], x ), "chscal:AlphaMustBeScalar" );
         end
 
         function chop_round_func(testCase)

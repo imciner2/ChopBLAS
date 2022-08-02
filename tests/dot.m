@@ -45,9 +45,21 @@ classdef dot < matlab.unittest.TestCase
         function chop_no_opts(testCase)
             testCase.rf( [], testCase.dopts );
 
+            res = testCase.xint'*testCase.yint;
+
             % Test with global rounding options
             z = chdot( testCase.xint, testCase.yint, 'Rounding', testCase.rf );
-            testCase.verifyEqual( z, testCase.xint'*testCase.yint );
+            testCase.verifyEqual( z, res );
+
+            z = chdot( testCase.xint', testCase.yint, 'Rounding', testCase.rf );
+            testCase.verifyEqual( z, res );
+
+            z = chdot( testCase.xint, testCase.yint', 'Rounding', testCase.rf );
+            testCase.verifyEqual( z, res );
+
+            % Test argument verification
+            testCase.verifyError( @() chdot( [2, 3], [3, 4, 5] ), "chdot:xyMustBeCompatibleSize" );
+            testCase.verifyError( @() chdot( [2, 3, 4], [3, 4] ), "chdot:xyMustBeCompatibleSize" );
         end
 
         % Use custom rounding function

@@ -42,6 +42,20 @@ classdef axpy < matlab.unittest.TestCase
     end
 
     methods(Test)
+        % Test argument validation
+        function argument_checks(testCase)
+            % Alpha not a scalar
+            testCase.verifyError( @() chaxpy( [2; 2], [3; 4], [4; 5] ), "chaxpy:AlphaMustBeScalar" );
+
+            % Wrong vector lengths
+            testCase.verifyError( @() chaxpy( [2], [3; 4], [4; 5; 6] ), "chaxpy:xyMustBeSameSize" );
+            testCase.verifyError( @() chaxpy( [2], [3; 4; 6], [4; 5] ), "chaxpy:xyMustBeSameSize" );
+
+            % Wrong vector orientations
+            testCase.verifyError( @() chaxpy( [2], [3; 4], [4, 5] ), "chaxpy:xyMustBeSameSize" );
+            testCase.verifyError( @() chaxpy( [2], [3, 4], [4; 5] ), "chaxpy:xyMustBeSameSize" );
+        end
+
         % No options specified, use global default of the double mode
         function chop_no_opts(testCase)
             testCase.rf( [], testCase.dopts );

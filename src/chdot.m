@@ -48,7 +48,22 @@ if isempty(addopts) && ~isempty(mulopts)
     addopts = mulopts;
 end
 
-pp = roundfunc( x.*y, mulopts );
+sx = size( x );
+sy = size( y );
+
+if all( sx == sy )
+    % Both either column or row vectors
+    pp = roundfunc( x.*y, mulopts );
+elseif all( flip(sx) == sy )
+    % One column and one row vector given
+    pp = roundfunc( x'.*y, mulopts );
+else
+    % Sizes aren't compatible
+    errmsg = strcat( "Vectors x and y must be compatible sizes - ",...
+                     "[", num2str(sx(1)), "x", num2str(sx(2)), "] vs. ", ...
+                     "[", num2str(sy(1)), "x", num2str(sy(2)), "]" );
+    error( "chdot:xyMustBeCompatibleSize", errmsg );
+end
 
 dot = pp(1);
 for i=2:length(pp)
