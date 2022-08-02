@@ -58,6 +58,31 @@ classdef gemv < matlab.unittest.TestCase
     end
 
     methods(Test)
+        function argument_checks(testCase)
+            alpha = 1.0;
+            beta = 2.0;
+            A = [2, 3, 4;
+                 5, 6, 7];
+            x = [2; 3; 4];
+            y = [4; 5; 6];
+
+            testCase.verifyError( @() chgemv( [2; 2], A, x, beta, y ), "chgemv:AlphaMustBeScalar" );
+            testCase.verifyError( @() chgemv( alpha, A, x, [2; 2], y ), "chgemv:BetaMustBeScalar" );
+
+            % Wrong vector lengths
+            testCase.verifyError( @() chgemv( alpha, A, x, beta, y(1:2) ), "chgemv:xyMustBeSameSize" );
+            testCase.verifyError( @() chgemv( alpha, A, x(1:2), beta, y ), "chgemv:xyMustBeSameSize" );
+
+            % Wrong vector orientations
+            testCase.verifyError( @() chgemv( alpha, A, x, beta, y' ), "chgemv:xyMustBeColumnVectors" );
+            testCase.verifyError( @() chgemv( alpha, A, x', beta, y ), "chgemv:xyMustBeColumnVectors" );
+            testCase.verifyError( @() chgemv( alpha, A, x', beta, y' ), "chgemv:xyMustBeColumnVectors" );
+
+            % Wrong sizes for A and x
+            testCase.verifyError( @() chgemv( alpha, A(:,1:2), x, beta, y ), "chgemv:AxMustBeCompatibleSizes" );
+            testCase.verifyError( @() chgemv( alpha, A, x, beta, y, 'Transpose', true ), "chgemv:AxMustBeCompatibleSizes" );
+        end
+
         function normal_operation(testCase)
             %% Test the full function with full precision
             testCase.rf( [], testCase.dopts );

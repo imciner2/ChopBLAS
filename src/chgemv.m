@@ -65,6 +65,31 @@ if isempty(addopts) && ~isempty(mulopts)
     addopts = mulopts;
 end
 
+% Verify arguments and their sizes
+sx = size(x);
+sy = size(y);
+sA = size(A);
+
+if ~isscalar( alpha )
+    error( "chgemv:AlphaMustBeScalar", "alpha must be a scalar." );
+end
+if ~isscalar( beta )
+    error( "chgemv:BetaMustBeScalar", "beta must be a scalar." );
+end
+if ( ( sx(2) ~= 1 ) && ~isempty(x) ) || ( ( sy(2) ~= 1 ) && ~isempty(y) )
+    error( "chgemv:xyMustBeColumnVectors", "The x and y vectors must be column vectors." );
+end
+if ~( all( sx == sy ) ) && ~isempty(x) && ~isempty(y)
+    error( "chgemv:xyMustBeSameSize", "The x and y vectors must be the same size." );
+end
+if ( ~trans && ( sx(1) ~= sA(2) ) ) || ( trans && ( sx(1) ~= sA(1) ) )
+    errmsg = strcat( "A and x must be compatible sizes - ",...
+                     "[", num2str(sA(1)), "x", num2str(sA(2)), "] vs. ", ...
+                     "[", num2str(sx(1)), "x", num2str(sx(2)), "]." );
+    error( "chgemv:AxMustBeCompatibleSizes", errmsg );
+end
+
+
 % Initialize output using scaled y vector
 if ( beta == 1 ) && ( ~isempty(y) )
     xout = y;
