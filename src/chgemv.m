@@ -83,17 +83,18 @@ elseif alpha ~= 1
 end
 
 if trans
-    % Compute the transposed product
-    for i=1:1:length(x)
-        t = roundfunc( A(i,:)'.*x(i), mulopts );
-        xout = roundfunc( xout + t, addopts );
-    end
+    % Matrix indexing needed to compute the transposed product
+    matind = @(i) A(i,:)';
 else
-    % Compute the non-transposed product
-    for i=1:1:length(x)
-        t = roundfunc( A(:,i).*x(i), mulopts );
-        xout = roundfunc( xout + t, addopts );
-    end
+    % Matrix indexing needed to compute the non-transposed product
+    matind = @(i) A(:,i);
+end
+
+for i=1:1:length(x)
+    % matind() will return a column vector of the matrix elements in the proper position
+    % for the final add (based on the transpose option)
+    t = roundfunc( matind(i).*x(i), mulopts );
+    xout = roundfunc( xout + t, addopts );
 end
 
 end
