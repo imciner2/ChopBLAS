@@ -84,21 +84,15 @@ end
 
 if trans
     % Compute the transposed product
-    for i=1:1:size(A,2)
-        A(:,i) = roundfunc( A(:,i).*x, mulopts );
-    end
-
-    for i=1:1:size(A,1)
-        xout = roundfunc( xout + A(i,:)', addopts );
+    for i=1:1:length(x)
+        t = roundfunc( A(i,:)'.*x(i), mulopts );
+        xout = roundfunc( xout + t, addopts );
     end
 else
     % Compute the non-transposed product
-    for i=1:1:size(A,1)
-        A(i,:) = roundfunc( A(i,:).*x', mulopts );
-    end
-
-    for i=1:1:size(A,2)
-        xout = roundfunc( xout + A(:,i), addopts );
+    for i=1:1:length(x)
+        t = roundfunc( A(:,i).*x(i), mulopts );
+        xout = roundfunc( xout + t, addopts );
     end
 end
 
