@@ -61,7 +61,7 @@ else
     % Sizes aren't compatible
     errmsg = strcat( "Vectors x and y must be compatible sizes - ",...
                      "[", num2str(sx(1)), "x", num2str(sx(2)), "] vs. ", ...
-                     "[", num2str(sy(1)), "x", num2str(sy(2)), "]" );
+                     "[", num2str(sy(1)), "x", num2str(sy(2)), "]." );
     error( "chdot:xyMustBeCompatibleSize", errmsg );
 end
 
