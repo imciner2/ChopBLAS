@@ -94,36 +94,56 @@ classdef trmv < matlab.unittest.TestCase
 
         function normal_operation_rounding_function(testCase)
             rf = @(x, y) zeros(length(x), 1);
-            ze = zeros(length(testCase.xint), 1);
+            z0 = zeros(length(testCase.xint), 1);
+            z1 = z0;
+            ze = z0;
+
+            z1(1) = testCase.xint(1);
+            ze(end) = testCase.xint(end);
 
             % Upper-triangular, normal, non-unit triangular matrix
             z = chtrmv( testCase.Aint, testCase.xint, 'Rounding', rf );
-            testCase.verifyEqual( z, ze, 'AbsTol', testCase.tol );
+            testCase.verifyEqual( z, z0, 'AbsTol', testCase.tol );
 
             z = chtrmv( testCase.Aint, testCase.xint, ...
                         'LowerTriangular', false, ...
                         'Rounding', rf );
-            testCase.verifyEqual( z, ze, 'AbsTol', testCase.tol );
+            testCase.verifyEqual( z, z0, 'AbsTol', testCase.tol );
 
             % Lower-triangular, normal, non-unit triangular matrix
             z = chtrmv( testCase.Aint, testCase.xint, ...
                         'LowerTriangular', true, ...
                         'Rounding', rf );
-            testCase.verifyEqual( z, ze, 'AbsTol', testCase.tol );
+            testCase.verifyEqual( z, z0, 'AbsTol', testCase.tol );
 
-            %% Test the unit-traingular options
-            % Upper-triangular, normal, unit triangular matrix
+            %% Test the unit-triangular options
+            % Upper-triangular, normal, unit triangular matrix, don't round last xout element
             z = chtrmv( testCase.Aint, testCase.xint, ...
                         'UnitTriangular', true, ...
                         'Rounding', rf );
             testCase.verifyEqual( z, ze, 'AbsTol', testCase.tol );
 
-            % Lower-triangular, normal, unit triangular matrix
+            % Upper-triangular, normal, unit triangular matrix, round last xout element
+            z = chtrmv( testCase.Aint, testCase.xint, ...
+                        'UnitTriangular', true, ...
+                        'Rounding', rf, ...
+                        'RoundAll', true );
+            testCase.verifyEqual( z, z0, 'AbsTol', testCase.tol );
+
+            % Lower-triangular, normal, unit triangular matrix, don't round first xout element
             z = chtrmv( testCase.Aint, testCase.xint, ...
                         'LowerTriangular', true, ...
                         'UnitTriangular', true, ...
                         'Rounding', rf );
-            testCase.verifyEqual( z, ze, 'AbsTol', testCase.tol );
+            testCase.verifyEqual( z, z1, 'AbsTol', testCase.tol );
+
+            % Lower-triangular, normal, unit triangular matrix, round first xout element
+            z = chtrmv( testCase.Aint, testCase.xint, ...
+                        'LowerTriangular', true, ...
+                        'UnitTriangular', true, ...
+                        'Rounding', rf, ...
+                        'RoundAll', true );
+            testCase.verifyEqual( z, z0, 'AbsTol', testCase.tol );
         end
 
         %% Test the rounding in the matrix-vector product with only one precision
@@ -297,36 +317,58 @@ classdef trmv < matlab.unittest.TestCase
 
         function transposed_operation_rounding_function(testCase)
             rf = @(x, y) zeros(length(x), 1);
-            ze = zeros(length(testCase.xint), 1);
+            z0 = zeros(length(testCase.xint), 1);
+            z1 = z0;
+            ze = z0;
+
+            z1(1) = testCase.xint(1);
+            ze(end) = testCase.xint(end);
 
             % Upper-triangular, transposed, non-unit triangular matrix
             z = chtrmv( testCase.Aint, testCase.xint, ...
                         'Transpose', true, ...
                         'Rounding', rf );
-            testCase.verifyEqual( z, ze, 'AbsTol', testCase.tol );
+            testCase.verifyEqual( z, z0, 'AbsTol', testCase.tol );
 
             % Lower-triangular, transposed, non-unit triangular matrix
             z = chtrmv( testCase.Aint, testCase.xint, ...
                         'Transpose', true, ...
                         'LowerTriangular', true, ...
                         'Rounding', rf );
-            testCase.verifyEqual( z, ze, 'AbsTol', testCase.tol );
+            testCase.verifyEqual( z, z0, 'AbsTol', testCase.tol );
 
             %% Test the unit-triangular options
-            % Upper-triangular, transposed, unit triangular matrix
+            % Upper-triangular, normal, unit triangular matrix, don't round first xout element
             z = chtrmv( testCase.Aint, testCase.xint, ...
                         'Transpose', true, ...
+                        'UnitTriangular', true, ...
+                        'Rounding', rf );
+            testCase.verifyEqual( z, z1, 'AbsTol', testCase.tol );
+
+            % Upper-triangular, normal, unit triangular matrix, round first xout element
+            z = chtrmv( testCase.Aint, testCase.xint, ...
+                        'Transpose', true, ...
+                        'UnitTriangular', true, ...
+                        'Rounding', rf, ...
+                        'RoundAll', true );
+            testCase.verifyEqual( z, z0, 'AbsTol', testCase.tol );
+
+            % Lower-triangular, normal, unit triangular matrix, don't round last xout element
+            z = chtrmv( testCase.Aint, testCase.xint, ...
+                        'Transpose', true, ...
+                        'LowerTriangular', true, ...
                         'UnitTriangular', true, ...
                         'Rounding', rf );
             testCase.verifyEqual( z, ze, 'AbsTol', testCase.tol );
 
-            % Lower-triangular, transposed, unit triangular matrix
+            % Lower-triangular, normal, unit triangular matrix, round last xout element
             z = chtrmv( testCase.Aint, testCase.xint, ...
-                        'LowerTriangular', true, ...
                         'Transpose', true, ...
+                        'LowerTriangular', true, ...
                         'UnitTriangular', true, ...
-                        'Rounding', rf );
-            testCase.verifyEqual( z, ze, 'AbsTol', testCase.tol );
+                        'Rounding', rf, ...
+                        'RoundAll', true );
+            testCase.verifyEqual( z, z0, 'AbsTol', testCase.tol );
         end
 
         %% Test the rounding in the matrix-vector product with only one precision

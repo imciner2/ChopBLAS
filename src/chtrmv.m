@@ -14,6 +14,10 @@ function [xout] = chtrmv( A, x, varargin )
 %   * 'UnitTriangular'  - If true, the matrix A is assumed to be unit triangular
 %                         (1 on the main diagonal) and the main diagonal isn't used.
 %                         Default: false
+%   * 'RoundAll'        - If true, ensure all elements of xout have been rounded using the addition rounding
+%                         mode. This will only affect the first/last entry in xout (depending on the
+%                         value of 'Transpose' and 'LowerTriangular').
+%                         Default: false
 %   * 'Rounding'        - Function handle to the function that will perform the rounding operation.
 %                         For more information on the interface 'roundfunc' must present, see the
 %                         ChopBlas documentation.
@@ -21,9 +25,15 @@ function [xout] = chtrmv( A, x, varargin )
 %
 % The order of operations for this function are as follows:
 %   1) Populate xout with the diagonal multiplication
-%      If unitdiag is `U`, then xout = x with no rounding.
-%      If unitdiag is `N`, then x is multiplied by the main diagonal and stored in xout.
+%      * If 'UnitTriangular' is true, then xout = x with rounding controlled by 'RoundAll'.
+%      * If 'UnitTriangular' is false, then x is multiplied by the main diagonal and stored in xout,
+%        with final rounding specified by 'RoundAll'.
 %   2) Compute the remaining terms of A*x or A'*x, accumulating onto xout.
+%   3) If 'RoundAll' is true, perform a final round of the element of xout never rounded by 'addopts' yet
+%      * If 'Transpose' is false and 'LowerTriangular' is false: Round last element
+%      * If 'Transpose' is false and 'LowerTriangular' is true: Round first element
+%      * If 'Transpose' is true and 'LowerTriangular' is true: Round last element
+%      * If 'Transpose' is true and 'LowerTriangular' is false: Round first element
 %
 % Two configurations for rounding are supported:
 %   * One rounding mode.
@@ -55,6 +65,7 @@ addParameter( p, 'LowerTriangular', false, isboolean );
 addParameter( p, 'Transpose', false, isboolean );
 addParameter( p, 'UnitTriangular', false, isboolean );
 addParameter( p, 'Rounding', @chop );
+addParameter( p, 'RoundAll', false, isboolean );
 
 parse( p, varargin{:} )
 
@@ -64,6 +75,7 @@ trans     = p.Results.Transpose;
 lowertri  = p.Results.LowerTriangular;
 unitdiag  = p.Results.UnitTriangular;
 roundfunc = p.Results.Rounding;
+roundall  = p.Results.RoundAll;
 
 % Allow only the first to be specified and have it be used for both
 if isempty(addopts) && ~isempty(mulopts)
@@ -90,6 +102,8 @@ if trans
 
             xout(r) = roundfunc( xout(r) + t', addopts );
         end
+
+        roundelem = nr;
     else
         % Compute the transposed upper-triangular product
         for i=1:1:(nr-1)
@@ -99,6 +113,8 @@ if trans
 
             xout(r) = roundfunc( xout(r) + t', addopts );
         end
+
+        roundelem = 1;
     end
 else
     if lowertri
@@ -110,6 +126,8 @@ else
 
             xout(r) = roundfunc( xout(r) + t, addopts );
         end
+
+        roundelem = 1;
     else
         % Compute the non-transposed upper-triangular product
         for i=2:1:nc
@@ -120,15 +138,14 @@ else
             xout(r) = roundfunc( xout(r) + t, addopts );
         end
 
-%        for i=1:1:nr
-%            r = i+1:1:nc;
-%            t = chop( A(i, r).*x(r)', mulopts );
-%
-%            for j=1:1:length(t)
-%                xout(i) = chop( xout(i) + t(j), addopts );
-%            end
-%        end
+        roundelem = nr;
     end
+end
+
+% Only round the first/last element in the output vector since it has never gone through an adder
+% rounding operation yet.
+if roundall
+    xout(roundelem) = roundfunc( xout(roundelem), addopts );
 end
 
 end
