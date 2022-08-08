@@ -7,10 +7,13 @@ function [xout] = chasum( x, varargin )
 % options will be used.
 %
 % This function supports the following optional name-value arguments:
-%   * 'Rounding' - Function handle to the function that will perform the rounding operation.
-%                  For more information on the interface 'roundfunc' must present, see the
-%                  ChopBlas documentation.
-%                  Default: @chop
+%   * 'Rounding'  - Function handle to the function that will perform the rounding operation.
+%                   For more information on the interface 'roundfunc' must present, see the
+%                   ChopBlas documentation.
+%                   Default: @chop
+%   * 'Algorithm' - The algorithm to use when performing the additions.
+%                   Supported algorithms: 'recursive', 'pairwise'
+%                   Default: 'recursive'
 %
 % Usage:
 %   [xout] = CHASUM( x, ... )
@@ -25,15 +28,23 @@ p = inputParser;
 p.StructExpand = false;
 addOptional( p, 'opts', struct([]) );
 addParameter( p, 'Rounding', @chop );
+addParameter( p, 'Algorithm', 'recursive' );
 
 parse( p, varargin{:} )
 
-opts   = p.Results.opts;
+opts      = p.Results.opts;
 roundfunc = p.Results.Rounding;
+algorithm = p.Results.Algorithm;
 
-xout = abs( x(1) );
-for i=2:length(pp)
-    xout = roundfunc( xout + abs( x(i) ), opts );
+x = abs( x );
+
+if strcmpi( algorithm, 'recursive' )
+    xout = chopblas_recursive_sum( x, roundfunc, opts );
+elseif strcmpi( algorithm, 'pairwise' )
+    xout = chopblas_pairwise_sum( x, roundfunc, opts );
+else
+    errmsg = strcat( "Unknown algorithm: ", algorithm );
+    error( "chasum:unknownAlgorithm", errmsg );
 end
 
 end
