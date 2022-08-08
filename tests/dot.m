@@ -13,6 +13,8 @@ classdef dot < matlab.unittest.TestCase
         xdec
         ydec
 
+        xodd;
+
         tol
     end
 
@@ -35,8 +37,10 @@ classdef dot < matlab.unittest.TestCase
             testCase.xdec = [1.0005; 2.34; 3.24; 4];
             testCase.ydec = [2.00125; 3.00225; 4.00014; 5.0025];
 
+            testCase.xodd = [1.0005; 2.34; 3.24; 4; 5.25678];
+
             % Set a tolerance for all the tests
-            testCase.tol = 1e-4;
+            testCase.tol = 1e-7;
         end
     end
 
@@ -73,6 +77,35 @@ classdef dot < matlab.unittest.TestCase
             % Test with trivial rounding function
             z = chdot( testCase.xint, testCase.yint, 'Rounding', @(x, y) zeros(length(x), 1) );
             testCase.verifyEqual( z, 0 );
+        end
+
+        % Change the addition algorithm
+        function chop_add_algorithm(testCase)
+            % Test with default of chop
+            chop( [], testCase.dopts );
+
+            z = chdot( testCase.xodd, testCase.xodd, 'Algorithm', 'recursive' );
+            testCase.verifyEqual( z, testCase.xodd'*testCase.xodd, 'AbsTol', testCase.tol );
+
+            % Test with an unknown algorithm specified
+            testCase.verifyError( @() chdot( [2, 3, 5], [3, 4, 5], 'Algorithm', 'random' ), "chdot:unknownAlgorithm" );
+
+            % Test with recursive algorithm
+            x = half( testCase.xodd.*testCase.xodd );
+            res = x(1);
+            for i=2:1:length(x)
+                res = half( res + x(i) );
+            end
+
+            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Algorithm', 'recursive' );
+            testCase.verifyEqual( z, res );
+
+            % Test with pairwise algorithm
+            x = half( testCase.xodd.*testCase.xodd );
+            res = half( half( half( x(1) + x(3) ) + half( x(2) + x(4) ) ) + x(5) );
+
+            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Algorithm', 'pairwise' );
+            testCase.verifyEqual( z, res );
         end
 
         % Only one mode specified, it is used in both operations

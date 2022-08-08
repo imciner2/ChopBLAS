@@ -5,10 +5,13 @@ function [dot] = chdot( x, y, varargin )
 % of each operation.
 %
 % This function supports the following optional name-value arguments:
-%   * 'Rounding' - Function handle to the function that will perform the rounding operation.
-%                  For more information on the interface 'roundfunc' must present, see the
-%                  ChopBlas documentation.
-%                  Default: @chop
+%   * 'Rounding'  - Function handle to the function that will perform the rounding operation.
+%                   For more information on the interface 'roundfunc' must present, see the
+%                   ChopBlas documentation.
+%                   Default: @chop
+%   * 'Algorithm' - The algorithm to use when performing the additions.
+%                   Supported algorithms: 'recursive', 'pairwise'
+%                   Default: 'recursive'
 %
 % Two configurations for rounding are supported:
 %   * One rounding mode.
@@ -36,12 +39,14 @@ p.StructExpand = false;
 addOptional( p, 'mulopts', struct([]) );
 addOptional( p, 'addopts', struct([]) );
 addParameter( p, 'Rounding', @chop );
+addParameter( p, 'Algorithm', 'recursive' );
 
 parse( p, varargin{:} )
 
 mulopts   = p.Results.mulopts;
 addopts   = p.Results.addopts;
 roundfunc = p.Results.Rounding;
+algorithm = p.Results.Algorithm;
 
 % Allow only the first to be specified and have it be used for both
 if isempty(addopts) && ~isempty(mulopts)
@@ -65,9 +70,13 @@ else
     error( "chdot:xyMustBeCompatibleSize", errmsg );
 end
 
-dot = pp(1);
-for i=2:length(pp)
-    dot = roundfunc( dot + pp(i), addopts );
+if strcmpi( algorithm, 'recursive' )
+    dot = chopblas_recursive_sum( pp, roundfunc, addopts );
+elseif strcmpi( algorithm, 'pairwise' )
+    dot = chopblas_pairwise_sum( pp, roundfunc, addopts );
+else
+    errmsg = strcat( "Unknown algorithm: ", algorithm );
+    error( "chdot:unknownAlgorithm", errmsg );
 end
 
 end
