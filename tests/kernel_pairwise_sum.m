@@ -49,7 +49,9 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
 
             % Test with a half-precision rounding mode
             x = testCase.xeven;
-            res = half( half( x(1) + x(3) ) + half( x(2) + x(4) ) );
+            i1  = double( half( x(1) + x(3) ) );
+            i2  = double( half( x(2) + x(4) ) );
+            res = double( half( i1 + i2 ) );
 
             z = chopblas_recursive_sum( testCase.xeven, testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );
@@ -67,7 +69,11 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
 
             % Test with a half-precision rounding mode
             x = testCase.xodd;
-            res = half( half( half( x(1) + x(3) ) + half( x(2) + x(4) ) ) + x(5) );
+
+            i1  = double( half( x(1) + x(3) ) );
+            i2  = double( half( x(2) + x(4) ) );
+            i3  = double( half( i1 + i2 ) );
+            res = double( half( i3 + x(5) ) );
 
             z = chopblas_pairwise_sum( testCase.xodd, testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );

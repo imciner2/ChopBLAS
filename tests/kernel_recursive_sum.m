@@ -51,7 +51,7 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
             % Test with a half-precision rounding mode
             res = testCase.xeven(1);
             for i=2:1:length(testCase.xeven)
-                res = half( res + testCase.xeven(i) );
+                res = double( half( res + testCase.xeven(i) ) );
             end
 
             z = chopblas_recursive_sum( testCase.xeven, testCase.rf, testCase.hopts );
@@ -71,7 +71,7 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
             % Test with a half-precision rounding mode
             res = testCase.xodd(1);
             for i=2:1:length(testCase.xodd)
-                res = half( res + testCase.xodd(i) );
+                res = double( half( res + testCase.xodd(i) ) );
             end
 
             z = chopblas_recursive_sum( testCase.xodd, testCase.rf, testCase.hopts );
