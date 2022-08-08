@@ -84,7 +84,7 @@ classdef dot < matlab.unittest.TestCase
             % Test with default of chop
             chop( [], testCase.dopts );
 
-            z = chdot( testCase.xodd, testCase.xodd, 'Algorithm', 'recursive' );
+            z = chdot( testCase.xodd, testCase.xodd, 'Rounding', testCase.rf, 'Algorithm', 'recursive' );
             testCase.verifyEqual( z, testCase.xodd'*testCase.xodd, 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
@@ -97,14 +97,14 @@ classdef dot < matlab.unittest.TestCase
                 res = half( res + x(i) );
             end
 
-            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Algorithm', 'recursive' );
+            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Algorithm', 'recursive' );
             testCase.verifyEqual( z, res );
 
             % Test with pairwise algorithm
             x = half( testCase.xodd.*testCase.xodd );
             res = half( half( half( x(1) + x(3) ) + half( x(2) + x(4) ) ) + x(5) );
 
-            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Algorithm', 'pairwise' );
+            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Algorithm', 'pairwise' );
             testCase.verifyEqual( z, res );
         end
 
