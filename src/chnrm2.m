@@ -27,7 +27,7 @@ function [nrm] = chnrm2( x, varargin )
 
 % Created by: Ian McInerney
 % Created on: May 20, 2022
-% License: BSD-2-Clause
+% SPDX-License-Identifier: BSD-2-Clause
 
 
 %% Setup the argument parsing

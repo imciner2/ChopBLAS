@@ -53,7 +53,7 @@ function [xout] = chtrmv( A, x, varargin )
 
 % Created by: Ian McInerney
 % Created on: June 23, 2022
-% License: BSD-2-Clause
+% SPDX-License-Identifier: BSD-2-Clause
 
 %% Setup the argument parsing
 isboolean = @(x) islogical(x) && isscalar(x);

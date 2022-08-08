@@ -28,7 +28,7 @@ function [xout] = chaxpy( alpha, x, y, varargin )
 
 % Created by: Ian McInerney
 % Created on: June 15, 2022
-% License: BSD-2-Clause
+% SPDX-License-Identifier: BSD-2-Clause
 
 %% Setup the argument parsing
 p = inputParser;

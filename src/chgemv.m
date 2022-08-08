@@ -41,7 +41,7 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 
 % Created by: Ian McInerney
 % Created on: June 16, 2022
-% License: BSD-2-Clause
+% SPDX-License-Identifier: BSD-2-Clause
 
 
 %% Setup the argument parsing
