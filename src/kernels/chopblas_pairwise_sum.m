@@ -11,11 +11,9 @@ function [s] = chopblas_pairwise_sum( x, roundfunc, opts )
 lx = length(x);
 isodd = mod( length(x), 2 );
 
-if isodd
-    s = x(1:end-1);
-else
-    s = x;
-end
+% Extract only an even number of elements, leaving one element behind if there are
+% an odd number
+s = x(1:end-isodd);
 
 while length(s) > 1
     s = roundfunc( s(1:2:end-1) + s(2:2:end), opts );
