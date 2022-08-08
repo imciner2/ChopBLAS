@@ -53,6 +53,19 @@ classdef trmv < matlab.unittest.TestCase
     end
 
     methods(Test)
+        function argument_checks(testCase)
+            A = [2, 3, 4;
+                 0, 6, 7];
+            x = [2; 3; 4];
+
+            % Wrong vector orientation
+            testCase.verifyError( @() chtrmv( A, x' ), "chtrmv:xMustBeColumnVector" );
+
+            % Wrong sizes for A and x
+            testCase.verifyError( @() chtrmv( A(:,1:2), x ), "chtrmv:AxMustBeCompatibleSizes" );
+            testCase.verifyError( @() chtrmv( A, x, 'Transpose', true ), "chtrmv:AxMustBeCompatibleSizes" );
+        end
+
         function normal_operation(testCase)
             %% Test the full function with full precision
             testCase.rf( [], testCase.dopts );

@@ -82,6 +82,20 @@ if isempty(addopts) && ~isempty(mulopts)
     addopts = mulopts;
 end
 
+% Verify arguments and their sizes
+sx = size(x);
+sA = size(A);
+
+if sx(2) ~= 1
+    error( "chtrmv:xMustBeColumnVector", "The x vector must be a column vector." );
+end
+if ( ~trans && ( sx(1) ~= sA(2) ) ) || ( trans && ( sx(1) ~= sA(1) ) )
+    errmsg = strcat( "A and x must be compatible sizes - ",...
+                     "[", num2str(sA(1)), "x", num2str(sA(2)), "] vs. ", ...
+                     "[", num2str(sx(1)), "x", num2str(sx(2)), "]." );
+    error( "chtrmv:AxMustBeCompatibleSizes", errmsg );
+end
+
 %% Preload the output vector with the main diagonal result
 if unitdiag
     xout = x;
