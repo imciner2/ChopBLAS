@@ -87,7 +87,8 @@ classdef gemv < matlab.unittest.TestCase
             %% Test the full function with full precision
             testCase.rf( [], testCase.dopts );
 
-            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
 
             %% Test the rounding in the matrix-vector product with only one precision
@@ -103,7 +104,8 @@ classdef gemv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             %% Test the rounding in the matrix-vector product with two different precisions
-            z = chgemv( 1, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts, 'Rounding', testCase.rf );
+            z = chgemv( 1, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             c = zeros(length(testCase.xdec), 1);
             for i=1:length(c)
@@ -125,7 +127,8 @@ classdef gemv < matlab.unittest.TestCase
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Adec*testCase.xdec) ), 'AbsTol', testCase.tol );
 
             % Test with trivial rounding function
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 2, [], 'Rounding', @(x, y) zeros(length(x), 1) );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 2, [], ...
+                        'Rounding', @(x, y) zeros(length(x), 1) );
             testCase.verifyEqual( z, zeros(length(testCase.xdec), 1) );
         end
 
@@ -133,11 +136,15 @@ classdef gemv < matlab.unittest.TestCase
             %% Test the transposed function with full precision
             testCase.rf( [], testCase.dopts );
 
-            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, 'Transpose', true, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint'*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
 
             %% Test the rounding in the matrix-vector product with only one precision
-            z = chgemv( 1, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.hopts, 'Transpose', true, 'Rounding', testCase.rf );
+            z = chgemv( 1, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.hopts, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf );
 
             c = zeros(length(testCase.xdec), 1);
             for i=1:length(c)
@@ -149,7 +156,9 @@ classdef gemv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             %% Test the rounding in the matrix-vector product with two different precisions
-            z = chgemv( 1, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts, 'Transpose', true, 'Rounding', testCase.rf );
+            z = chgemv( 1, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf );
 
             c = zeros(length(testCase.xdec), 1);
             for i=1:length(c)
@@ -164,7 +173,8 @@ classdef gemv < matlab.unittest.TestCase
         function accumulate_rounding(testCase)
             %% Only one precision used
             % No rounding for beta=1
-            z = chgemv( 1, testCase.Aeye, testCase.xdec, 1, testCase.ydec, testCase.hopts, 'Rounding', testCase.rf );
+            z = chgemv( 1, testCase.Aeye, testCase.xdec, 1, testCase.ydec, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             % The specification is that y is preloaded into the output and then accumulated onto
             c = testCase.ydec;
@@ -177,7 +187,8 @@ classdef gemv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Rounding for non-unit beta
-            z = chgemv( 1, testCase.Aeye, testCase.xdec, 3, testCase.ydec, testCase.hopts, 'Rounding', testCase.rf );
+            z = chgemv( 1, testCase.Aeye, testCase.xdec, 3, testCase.ydec, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             % The specification is that y is preloaded into the output and then accumulated onto
             c = testCase.rf( 3.*testCase.ydec, testCase.hopts );
@@ -191,7 +202,8 @@ classdef gemv < matlab.unittest.TestCase
 
             %% Two precisions used
             % No rounding for beta=1
-            z = chgemv( 1, testCase.Aeye, testCase.xdec, 1, testCase.ydec, testCase.sopts, testCase.hopts, 'Rounding', testCase.rf );
+            z = chgemv( 1, testCase.Aeye, testCase.xdec, 1, testCase.ydec, testCase.sopts, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             % The specification is that y is preloaded into the output and then accumulated onto
             c = testCase.ydec;
@@ -204,7 +216,8 @@ classdef gemv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Rounding for non-unit beta
-            z = chgemv( 1, testCase.Aeye, testCase.xdec, 3, testCase.ydec, testCase.sopts, testCase.hopts, 'Rounding', testCase.rf );
+            z = chgemv( 1, testCase.Aeye, testCase.xdec, 3, testCase.ydec, testCase.sopts, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             % The specification is that y is preloaded into the output with rounding done using mulopts, and then accumulated onto
             c = testCase.rf( 3.*testCase.ydec, testCase.sopts );
@@ -222,21 +235,28 @@ classdef gemv < matlab.unittest.TestCase
             %% Test with no accumulate vector with full precision
             testCase.rf( [], testCase.dopts );
 
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Adec*testCase.xdec) ), 'AbsTol', testCase.tol );
 
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 2, [], 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 2, [], ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Adec*testCase.xdec) ), 'AbsTol', testCase.tol );
 
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, 'Transpose', true, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Adec'*testCase.xdec) ), 'AbsTol', testCase.tol );
 
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 2, [], 'Transpose', true, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 2, [], ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*(testCase.Adec'*testCase.xdec) ), 'AbsTol', testCase.tol );
 
             %% Test the rounding in the scaling of the matrix-vector result with one precision
             % Normal matrix
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.hopts, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             c  = zeros(length(testCase.xdec), 1);
             tx = testCase.rf( testCase.alpha.*testCase.xdec, testCase.hopts );
@@ -249,7 +269,9 @@ classdef gemv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Transposed matrix
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.hopts, 'Transpose', true, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.hopts, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf );
 
             c  = zeros(length(testCase.xdec), 1);
             tx = testCase.rf( testCase.alpha.*testCase.xdec, testCase.hopts );
@@ -263,7 +285,8 @@ classdef gemv < matlab.unittest.TestCase
 
             %% Test the rounding in the scaling of the matrix-vector result with two precisions
             % Normal matrix
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             c = zeros(length(testCase.xdec), 1);
             tx = testCase.rf( testCase.alpha.*testCase.xdec, testCase.sopts );
@@ -276,7 +299,9 @@ classdef gemv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
 
             % Transposed matrix
-            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts, 'Transpose', true, 'Rounding', testCase.rf );
+            z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 0, testCase.ydec, testCase.sopts, testCase.hopts, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf );
 
             c  = zeros(length(testCase.xdec), 1);
             tx = testCase.rf( testCase.alpha.*testCase.xdec, testCase.hopts );

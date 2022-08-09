@@ -37,7 +37,8 @@ classdef scal < matlab.unittest.TestCase
             % Set the default format for chop to double precision
             testCase.rf( [], testCase.dopts );
 
-            y = chscal( alpha, x, 'Rounding', testCase.rf );
+            y = chscal( alpha, x, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( y, 2.*x );
 
             % Alpha not a scalar
@@ -55,7 +56,8 @@ classdef scal < matlab.unittest.TestCase
             testCase.verifyEqual( y, 2.*x );
 
             % Test a trivial rounding function
-            y = chscal( alpha, x, 'Rounding', @(x, y) zeros(length(x), 1) );
+            y = chscal( alpha, x, ...
+                        'Rounding', @(x, y) zeros(length(x), 1) );
             testCase.verifyEqual( y, zeros(length(x), 1) );
         end
 
@@ -63,7 +65,8 @@ classdef scal < matlab.unittest.TestCase
             alpha = 20000;
             x = [1, 2, -2, 20, 30];
 
-            y = chscal( alpha, x, testCase.hopts, 'Rounding', testCase.rf );
+            y = chscal( alpha, x, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             testCase.verifyEqual( y, [20000, 40000, -40000, Inf, Inf] );
         end

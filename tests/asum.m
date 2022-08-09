@@ -46,7 +46,8 @@ classdef asum < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );;
 
             % Test with global rounding options
-            z = chasum( testCase.xint, 'Rounding', testCase.rf );
+            z = chasum( testCase.xint, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, sum( abs( testCase.xint ) ) );
         end
 
@@ -59,7 +60,8 @@ classdef asum < matlab.unittest.TestCase
             testCase.verifyEqual( z, sum( abs( testCase.xint ) ) );
 
             % Test with trivial rounding function
-            z = chasum( testCase.xint, 'Rounding', @(x, y) zeros(length(x), 1) );
+            z = chasum( testCase.xint, ...
+                        'Rounding', @(x, y) zeros(length(x), 1) );
             testCase.verifyEqual( z, 0 );
         end
 
@@ -68,7 +70,9 @@ classdef asum < matlab.unittest.TestCase
             % Test with default of chop
             chop( [], testCase.dopts );
 
-            z = chasum( testCase.xodd, 'Rounding', testCase.rf, 'Summation', 'recursive' );
+            z = chasum( testCase.xodd, ...
+                        'Rounding', testCase.rf, ...
+                        'Summation', 'recursive' );
             testCase.verifyEqual( z, sum( abs( testCase.xodd ) ), 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
@@ -81,7 +85,9 @@ classdef asum < matlab.unittest.TestCase
                 res = double( half( res + x(i) ) );
             end
 
-            z = chasum( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'recursive' );
+            z = chasum( testCase.xodd, testCase.hopts, ...
+                        'Rounding', testCase.rf, ...
+                        'Summation', 'recursive' );
             testCase.verifyEqual( z, res );
 
             % Test with pairwise algorithm
@@ -91,13 +97,16 @@ classdef asum < matlab.unittest.TestCase
             i3  = double( half( i1 + i2 ) );
             res = double( half( i3 + x(5) ) );
 
-            z = chasum( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'pairwise' );
+            z = chasum( testCase.xodd, testCase.hopts, ...
+                        'Rounding', testCase.rf, ...
+                        'Summation', 'pairwise' );
             testCase.verifyEqual( z, res );
         end
 
         % Only one mode specified, it is used in all operations
         function chop_one_mode(testCase)
-            z = chasum( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf );
+            z = chasum( testCase.xodd, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             x = abs( testCase.xodd );
             c = x(1);

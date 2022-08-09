@@ -46,7 +46,8 @@ classdef nrm2 < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );;
 
             % Test with global rounding options
-            z = chnrm2( testCase.xint, 'Rounding', testCase.rf );
+            z = chnrm2( testCase.xint, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, sqrt( testCase.xint'*testCase.xint ) );
         end
 
@@ -59,7 +60,8 @@ classdef nrm2 < matlab.unittest.TestCase
             testCase.verifyEqual( z, sqrt( testCase.xint'*testCase.xint ) );
 
             % Test with trivial rounding function
-            z = chnrm2( testCase.xint, 'Rounding', @(x, y) zeros(length(x), 1) );
+            z = chnrm2( testCase.xint, ...
+                        'Rounding', @(x, y) zeros(length(x), 1) );
             testCase.verifyEqual( z, 0 );
         end
 
@@ -68,7 +70,9 @@ classdef nrm2 < matlab.unittest.TestCase
             % Test with default of chop
             chop( [], testCase.dopts );
 
-            z = chnrm2( testCase.xodd, 'Rounding', testCase.rf, 'Summation', 'recursive' );
+            z = chnrm2( testCase.xodd, ...
+                        'Rounding', testCase.rf, ...
+                        'Summation', 'recursive' );
             testCase.verifyEqual( z, sqrt( testCase.xodd'*testCase.xodd ), 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
@@ -82,7 +86,9 @@ classdef nrm2 < matlab.unittest.TestCase
             end
             res = double( half( sqrt( res ) ) );
 
-            z = chnrm2( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'recursive' );
+            z = chnrm2( testCase.xodd, testCase.hopts, ...
+                        'Rounding', testCase.rf, ...
+                        'Summation', 'recursive' );
             testCase.verifyEqual( z, res );
 
             % Test with pairwise algorithm
@@ -93,13 +99,16 @@ classdef nrm2 < matlab.unittest.TestCase
             res = double( half( i3 + x(5) ) );
             res = double( half( sqrt( res ) ) );
 
-            z = chnrm2( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'pairwise' );
+            z = chnrm2( testCase.xodd, testCase.hopts, ...
+                        'Rounding', testCase.rf, ...
+                        'Summation', 'pairwise' );
             testCase.verifyEqual( z, res );
         end
 
         % Only one mode specified, it is used in all operations
         function chop_one_mode(testCase)
-            z = chnrm2( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf );
+            z = chnrm2( testCase.xodd, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             c = 0;
             for i=1:length(testCase.xodd)
@@ -119,7 +128,8 @@ classdef nrm2 < matlab.unittest.TestCase
             end
             c = sqrt( double( c ) );
 
-            zall = chnrm2( testCase.xodd, testCase.sopts, testCase.hopts, testCase.dopts, 'Rounding', testCase.rf );
+            zall = chnrm2( testCase.xodd, testCase.sopts, testCase.hopts, testCase.dopts, ...
+                           'Rounding', testCase.rf );
             testCase.verifyEqual( zall, c );
 
             c = 0;
@@ -129,7 +139,8 @@ classdef nrm2 < matlab.unittest.TestCase
             end
             c = sqrt( c );
 
-            z = chnrm2( testCase.xodd, testCase.hopts, testCase.hopts, testCase.dopts, 'Rounding', testCase.rf );
+            z = chnrm2( testCase.xodd, testCase.hopts, testCase.hopts, testCase.dopts, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, c );
 
             % The two test cases above should not produce the same result due to the half-precision rounding

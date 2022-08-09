@@ -61,7 +61,8 @@ classdef axpy < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );
 
             % Use the provided rounding function
-            z = chaxpy( testCase.alpha, testCase.xint, testCase.yint, 'Rounding', testCase.rf );
+            z = chaxpy( testCase.alpha, testCase.xint, testCase.yint, ...
+                        'Rounding', testCase.rf );
             testCase.verifyEqual( z, (testCase.alpha.*testCase.xint) + testCase.yint );
         end
 
@@ -74,13 +75,15 @@ classdef axpy < matlab.unittest.TestCase
             testCase.verifyEqual( z, (testCase.alpha.*testCase.xint) + testCase.yint );
 
             % Test a trivial rounding function to ensure it overrides it
-            z = chaxpy( testCase.alpha, testCase.xint, testCase.yint, 'Rounding', @(x, y) zeros(length(x), 1) );
+            z = chaxpy( testCase.alpha, testCase.xint, testCase.yint, ...
+                        'Rounding', @(x, y) zeros(length(x), 1) );
             testCase.verifyEqual( z, zeros(length(testCase.xint), 1) );
         end
 
         % Only one mode specified, it is used in both operations
         function chop_one_mode(testCase)
-            z = chaxpy( testCase.alpha, testCase.xdec, testCase.ydec, testCase.hopts, 'Rounding', testCase.rf );
+            z = chaxpy( testCase.alpha, testCase.xdec, testCase.ydec, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             c = zeros(length(testCase.xdec), 1);
             for i=1:length(testCase.xdec)
@@ -92,7 +95,8 @@ classdef axpy < matlab.unittest.TestCase
 
         % Two modes specified, each operation has a different mode
         function chop_two_modes(testCase)
-            z = chaxpy( testCase.alpha, testCase.xdec, testCase.ydec, testCase.sopts, testCase.hopts, 'Rounding', testCase.rf );
+            z = chaxpy( testCase.alpha, testCase.xdec, testCase.ydec, testCase.sopts, testCase.hopts, ...
+                        'Rounding', testCase.rf );
 
             c = zeros(length(testCase.xdec), 1);
             for i=1:length(testCase.xdec)

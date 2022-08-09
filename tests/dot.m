@@ -52,13 +52,16 @@ classdef dot < matlab.unittest.TestCase
             res = testCase.xint'*testCase.yint;
 
             % Test with global rounding options
-            z = chdot( testCase.xint, testCase.yint, 'Rounding', testCase.rf );
+            z = chdot( testCase.xint, testCase.yint, ...
+                       'Rounding', testCase.rf );
             testCase.verifyEqual( z, res );
 
-            z = chdot( testCase.xint', testCase.yint, 'Rounding', testCase.rf );
+            z = chdot( testCase.xint', testCase.yint, ...
+                       'Rounding', testCase.rf );
             testCase.verifyEqual( z, res );
 
-            z = chdot( testCase.xint, testCase.yint', 'Rounding', testCase.rf );
+            z = chdot( testCase.xint, testCase.yint', ...
+                       'Rounding', testCase.rf );
             testCase.verifyEqual( z, res );
 
             % Test argument verification
@@ -75,7 +78,8 @@ classdef dot < matlab.unittest.TestCase
             testCase.verifyEqual( z, testCase.xint'*testCase.yint );
 
             % Test with trivial rounding function
-            z = chdot( testCase.xint, testCase.yint, 'Rounding', @(x, y) zeros(length(x), 1) );
+            z = chdot( testCase.xint, testCase.yint, ...
+                       'Rounding', @(x, y) zeros(length(x), 1) );
             testCase.verifyEqual( z, 0 );
         end
 
@@ -84,7 +88,9 @@ classdef dot < matlab.unittest.TestCase
             % Test with default of chop
             chop( [], testCase.dopts );
 
-            z = chdot( testCase.xodd, testCase.xodd, 'Rounding', testCase.rf, 'Summation', 'recursive' );
+            z = chdot( testCase.xodd, testCase.xodd, ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'recursive' );
             testCase.verifyEqual( z, testCase.xodd'*testCase.xodd, 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
@@ -97,20 +103,25 @@ classdef dot < matlab.unittest.TestCase
                 res = half( res + x(i) );
             end
 
-            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'recursive' );
+            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'recursive' );
             testCase.verifyEqual( z, res );
 
             % Test with pairwise algorithm
             x = half( testCase.xodd.*testCase.xodd );
             res = half( half( half( x(1) + x(3) ) + half( x(2) + x(4) ) ) + x(5) );
 
-            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'pairwise' );
+            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'pairwise' );
             testCase.verifyEqual( z, res );
         end
 
         % Only one mode specified, it is used in both operations
         function chop_one_mode(testCase)
-            z = chdot( testCase.xdec, testCase.ydec, testCase.hopts, 'Rounding', testCase.rf );
+            z = chdot( testCase.xdec, testCase.ydec, testCase.hopts, ...
+                       'Rounding', testCase.rf );
 
             c = 0;
             for i=1:length(testCase.xdec)
@@ -122,7 +133,8 @@ classdef dot < matlab.unittest.TestCase
 
         % Two modes specified, each operation has a different mode
         function chop_two_modes(testCase)
-            z = chdot( testCase.xdec, testCase.ydec, testCase.sopts, testCase.hopts, 'Rounding', testCase.rf );
+            z = chdot( testCase.xdec, testCase.ydec, testCase.sopts, testCase.hopts, ...
+                       'Rounding', testCase.rf );
 
             c = 0;
             for i=1:length(testCase.xdec)
