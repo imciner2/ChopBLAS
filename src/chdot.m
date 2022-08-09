@@ -9,7 +9,7 @@ function [dot] = chdot( x, y, varargin )
 %                   For more information on the interface 'roundfunc' must present, see the
 %                   ChopBlas documentation.
 %                   Default: @chop
-%   * 'Algorithm' - The algorithm to use when performing the additions.
+%   * 'Summation' - The algorithm to use when performing the additions.
 %                   Supported algorithms: 'recursive', 'pairwise'
 %                   Default: 'recursive'
 %
@@ -39,14 +39,14 @@ p.StructExpand = false;
 addOptional( p, 'mulopts', struct([]) );
 addOptional( p, 'addopts', struct([]) );
 addParameter( p, 'Rounding', @chop );
-addParameter( p, 'Algorithm', 'recursive' );
+addParameter( p, 'Summation', 'recursive' );
 
 parse( p, varargin{:} )
 
 mulopts   = p.Results.mulopts;
 addopts   = p.Results.addopts;
 roundfunc = p.Results.Rounding;
-algorithm = p.Results.Algorithm;
+algorithm = p.Results.Summation;
 
 % Allow only the first to be specified and have it be used for both
 if isempty(addopts) && ~isempty(mulopts)
@@ -75,8 +75,8 @@ if strcmpi( algorithm, 'recursive' )
 elseif strcmpi( algorithm, 'pairwise' )
     dot = chopblas_pairwise_sum( pp, roundfunc, addopts );
 else
-    errmsg = strcat( "Unknown algorithm: ", algorithm );
-    error( "chdot:unknownAlgorithm", errmsg );
+    errmsg = strcat( "Unknown summation algorithm: ", algorithm );
+    error( "chdot:unknownSummationAlgorithm", errmsg );
 end
 
 end

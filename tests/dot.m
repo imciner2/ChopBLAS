@@ -84,11 +84,11 @@ classdef dot < matlab.unittest.TestCase
             % Test with default of chop
             chop( [], testCase.dopts );
 
-            z = chdot( testCase.xodd, testCase.xodd, 'Rounding', testCase.rf, 'Algorithm', 'recursive' );
+            z = chdot( testCase.xodd, testCase.xodd, 'Rounding', testCase.rf, 'Summation', 'recursive' );
             testCase.verifyEqual( z, testCase.xodd'*testCase.xodd, 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
-            testCase.verifyError( @() chdot( [2, 3, 5], [3, 4, 5], 'Algorithm', 'random' ), "chdot:unknownAlgorithm" );
+            testCase.verifyError( @() chdot( [2, 3, 5], [3, 4, 5], 'Summation', 'random' ), "chdot:unknownSummationAlgorithm" );
 
             % Test with recursive algorithm
             x = half( testCase.xodd.*testCase.xodd );
@@ -97,14 +97,14 @@ classdef dot < matlab.unittest.TestCase
                 res = half( res + x(i) );
             end
 
-            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Algorithm', 'recursive' );
+            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'recursive' );
             testCase.verifyEqual( z, res );
 
             % Test with pairwise algorithm
             x = half( testCase.xodd.*testCase.xodd );
             res = half( half( half( x(1) + x(3) ) + half( x(2) + x(4) ) ) + x(5) );
 
-            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Algorithm', 'pairwise' );
+            z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'pairwise' );
             testCase.verifyEqual( z, res );
         end
 

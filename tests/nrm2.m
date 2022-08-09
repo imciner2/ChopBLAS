@@ -68,11 +68,11 @@ classdef nrm2 < matlab.unittest.TestCase
             % Test with default of chop
             chop( [], testCase.dopts );
 
-            z = chnrm2( testCase.xodd, 'Rounding', testCase.rf, 'Algorithm', 'recursive' );
+            z = chnrm2( testCase.xodd, 'Rounding', testCase.rf, 'Summation', 'recursive' );
             testCase.verifyEqual( z, sqrt( testCase.xodd'*testCase.xodd ), 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
-            testCase.verifyError( @() chnrm2( [2, 3, 5], 'Algorithm', 'random' ), "chnrm2:unknownAlgorithm" );
+            testCase.verifyError( @() chnrm2( [2, 3, 5], 'Summation', 'random' ), "chnrm2:unknownSummationAlgorithm" );
 
             % Test with recursive algorithm
             x = half( testCase.xodd.*testCase.xodd );
@@ -82,7 +82,7 @@ classdef nrm2 < matlab.unittest.TestCase
             end
             res = double( half( sqrt( res ) ) );
 
-            z = chnrm2( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Algorithm', 'recursive' );
+            z = chnrm2( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'recursive' );
             testCase.verifyEqual( z, res );
 
             % Test with pairwise algorithm
@@ -93,7 +93,7 @@ classdef nrm2 < matlab.unittest.TestCase
             res = double( half( i3 + x(5) ) );
             res = double( half( sqrt( res ) ) );
 
-            z = chnrm2( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Algorithm', 'pairwise' );
+            z = chnrm2( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'pairwise' );
             testCase.verifyEqual( z, res );
         end
 

@@ -11,7 +11,7 @@ function [xout] = chasum( x, varargin )
 %                   For more information on the interface 'roundfunc' must present, see the
 %                   ChopBlas documentation.
 %                   Default: @chop
-%   * 'Algorithm' - The algorithm to use when performing the additions.
+%   * 'Summation' - The algorithm to use when performing the additions.
 %                   Supported algorithms: 'recursive', 'pairwise'
 %                   Default: 'recursive'
 %
@@ -28,13 +28,13 @@ p = inputParser;
 p.StructExpand = false;
 addOptional( p, 'opts', struct([]) );
 addParameter( p, 'Rounding', @chop );
-addParameter( p, 'Algorithm', 'recursive' );
+addParameter( p, 'Summation', 'recursive' );
 
 parse( p, varargin{:} )
 
 opts      = p.Results.opts;
 roundfunc = p.Results.Rounding;
-algorithm = p.Results.Algorithm;
+algorithm = p.Results.Summation;
 
 x = abs( x );
 
@@ -43,8 +43,8 @@ if strcmpi( algorithm, 'recursive' )
 elseif strcmpi( algorithm, 'pairwise' )
     xout = chopblas_pairwise_sum( x, roundfunc, opts );
 else
-    errmsg = strcat( "Unknown algorithm: ", algorithm );
-    error( "chasum:unknownAlgorithm", errmsg );
+    errmsg = strcat( "Unknown summation algorithm: ", algorithm );
+    error( "chasum:unknownSummationAlgorithm", errmsg );
 end
 
 end

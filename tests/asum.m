@@ -68,11 +68,11 @@ classdef asum < matlab.unittest.TestCase
             % Test with default of chop
             chop( [], testCase.dopts );
 
-            z = chasum( testCase.xodd, 'Rounding', testCase.rf, 'Algorithm', 'recursive' );
+            z = chasum( testCase.xodd, 'Rounding', testCase.rf, 'Summation', 'recursive' );
             testCase.verifyEqual( z, sum( abs( testCase.xodd ) ), 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
-            testCase.verifyError( @() chasum( [2, 3, 5], 'Algorithm', 'random' ), "chasum:unknownAlgorithm" );
+            testCase.verifyError( @() chasum( [2, 3, 5], 'Summation', 'random' ), "chasum:unknownSummationAlgorithm" );
 
             % Test with recursive algorithm
             x = abs( testCase.xodd );
@@ -81,7 +81,7 @@ classdef asum < matlab.unittest.TestCase
                 res = double( half( res + x(i) ) );
             end
 
-            z = chasum( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Algorithm', 'recursive' );
+            z = chasum( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'recursive' );
             testCase.verifyEqual( z, res );
 
             % Test with pairwise algorithm
@@ -91,7 +91,7 @@ classdef asum < matlab.unittest.TestCase
             i3  = double( half( i1 + i2 ) );
             res = double( half( i3 + x(5) ) );
 
-            z = chasum( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Algorithm', 'pairwise' );
+            z = chasum( testCase.xodd, testCase.hopts, 'Rounding', testCase.rf, 'Summation', 'pairwise' );
             testCase.verifyEqual( z, res );
         end
 
