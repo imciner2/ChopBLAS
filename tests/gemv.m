@@ -118,6 +118,49 @@ classdef gemv < matlab.unittest.TestCase
             testCase.verifyEqual( z, c );
         end
 
+        % Test with blocked operation on a normal matrix
+        function normal_blocksize(testCase)
+            %% Test the full function with full precision
+            testCase.rf( [], testCase.dopts );
+
+            % Defaults to block size of n
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Rounding', testCase.rf );
+            testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
+
+            % Verify the tests for out-of-bounds values work
+            testCase.verifyWarning( @() chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                                              'Rounding', testCase.rf, ...
+                                              'BlockSize', 0 ), ...
+                                    "chgemv:BlockSizeTooSmall" );
+            testCase.verifyWarning( @() chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                                              'Rounding', testCase.rf, ...
+                                              'BlockSize', -5 ), ...
+                                    "chgemv:BlockSizeTooSmall" );
+            testCase.verifyWarning( @() chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                                              'Rounding', testCase.rf, ...
+                                              'BlockSize', 15 ), ...
+                                    "chgemv:BlockSizeTooLarge" );
+
+            % Use only 1 block
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Rounding', testCase.rf, ...
+                        'BlockSize', 7 );
+            testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
+
+            % Smallest blocksize possible
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Rounding', testCase.rf, ...
+                        'BlockSize', 1 );
+            testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
+
+            % Causes operations on 5 rows then 2 rows
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Rounding', testCase.rf, ...
+                        'BlockSize', 5 );
+            testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
+        end
+
         % No options specified, use global default of the double mode
         function rounding_function(testCase)
             %% Test with default rounding function
@@ -128,8 +171,58 @@ classdef gemv < matlab.unittest.TestCase
 
             % Test with trivial rounding function
             z = chgemv( testCase.alpha, testCase.Adec, testCase.xdec, 2, [], ...
-                        'Rounding', @(x, y) zeros(length(x), 1) );
+                        'Rounding', @(x, y) zeros(size(x)) );
             testCase.verifyEqual( z, zeros(length(testCase.xdec), 1) );
+        end
+
+        % Change the addition algorithm
+        function chop_add_algorithm(testCase)
+            % Test with default of chop
+            chop( [], testCase.dopts );
+
+            xodd = [1.0005; 2.34; 3.24; 4; 5.25678];
+            Aodd = [xodd';
+                    xodd';
+                    xodd';
+                    xodd';
+                    xodd'];
+
+            z = chgemv( 1.0, Aodd, xodd, 0, [], ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'recursive' );
+            testCase.verifyEqual( z, Aodd*xodd, 'AbsTol', testCase.tol );
+
+            % Test with an unknown algorithm specified
+            testCase.verifyError( @() chgemv( 1.0, Aodd, xodd, 0, [], 'Summation', 'random' ), "chgemv:unknownSummationAlgorithm" );
+
+            % Test with recursive algorithm
+            x   = double( half( Aodd.*Aodd ) );
+            res = zeros(length(x), 1);
+            for i=1:1:length(x)
+                for j=1:1:length(x)
+                    res(i) = double( half( res(i) + x(i,j) ) );
+                end
+            end
+
+            z = chgemv( 1.0, Aodd, xodd, 0, [], testCase.hopts, ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'recursive' );
+            testCase.verifyEqual( z, res );
+
+            % Test with pairwise algorithm
+            x   = double( half( Aodd.*Aodd ) );
+            res = zeros(length(x), 1);
+            for i=1:1:length(x)
+                i1     = double( half( x(i,1) + x(i,3) ) );
+                i2     = double( half( x(i,2) + x(i,4) ) );
+                i3     = double( half( i1 + i2 ) );
+                res(i) = double( half( i3 + x(i,5) ) );
+            end
+
+            z = chgemv( 1.0, Aodd, xodd, 0, [], testCase.hopts, ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'pairwise' );
+            testCase.verifyEqual( z, res );
         end
 
         function transposed_operation(testCase)
@@ -168,6 +261,56 @@ classdef gemv < matlab.unittest.TestCase
             end
 
             testCase.verifyEqual( z, c );
+        end
+
+        % Test with blocked operation on a transposed matrix
+        function transposed_blocksize(testCase)
+            %% Test the full function with full precision
+            testCase.rf( [], testCase.dopts );
+
+            % Defaults to block size of n
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf );
+            testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint'*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
+
+            % Verify the tests for out-of-bounds values work
+            testCase.verifyWarning( @() chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                                              'Rounding', testCase.rf, ...
+                                              'Transpose', true, ...
+                                              'BlockSize', 0 ), ...
+                                    "chgemv:BlockSizeTooSmall" );
+            testCase.verifyWarning( @() chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                                              'Rounding', testCase.rf, ...
+                                              'Transpose', true, ...
+                                              'BlockSize', -5 ), ...
+                                    "chgemv:BlockSizeTooSmall" );
+            testCase.verifyWarning( @() chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                                              'Rounding', testCase.rf, ...
+                                              'Transpose', true, ...
+                                              'BlockSize', 15 ), ...
+                                    "chgemv:BlockSizeTooLarge" );
+
+            % Use only 1 block
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf, ...
+                        'BlockSize', 7 );
+            testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint'*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
+
+            % Smallest blocksize possible
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf, ...
+                        'BlockSize', 1 );
+            testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint'*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
+
+            % Causes operations on 5 rows then 2 rows
+            z = chgemv( testCase.alpha, testCase.Aint, testCase.xint, testCase.beta, testCase.yint, ...
+                        'Transpose', true, ...
+                        'Rounding', testCase.rf, ...
+                        'BlockSize', 5 );
+            testCase.verifyEqual( z, (testCase.alpha.*(testCase.Aint'*testCase.xint) ) + testCase.beta.*testCase.yint, 'AbsTol', testCase.tol );
         end
 
         function accumulate_rounding(testCase)
