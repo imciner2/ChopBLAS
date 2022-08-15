@@ -1,5 +1,5 @@
 function [s] = chopblas_pairwise_sum_vec( x, roundfunc, opts )
-%CHOPBLAS_PAIRWISE_SUM Reduce a vector to a scalar with operation-level rounding
+%CHOPBLAS_PAIRWISE_SUM_VEC Reduce a vector to a scalar with operation-level rounding
 %
 % Reduce a vector to a scalar by adding all the entries in a pairwise fasion, with
 % rounding after each operation.
