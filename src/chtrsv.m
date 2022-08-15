@@ -19,7 +19,7 @@ function [x] = chtrsv( A, b, varargin )
 %                         'UnitTriangular' is true.
 %                         Default: true
 %   * 'Rounding'        - Function handle to the function that will perform the rounding operation.
-%                         For more information on the interface 'Rounding' must present, see the
+%                         For more information on the interface this function must have, see the
 %                         ChopBlas documentation.
 %                         Default: @chop
 %

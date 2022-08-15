@@ -12,7 +12,7 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 %   * 'Transpose' - If true, the computation is A'*x instead of A*x
 %                   Default: false
 %   * 'Rounding'  - Function handle to the function that will perform the rounding operation.
-%                   For more information on the interface 'roundfunc' must present, see the
+%                   For more information on the interface this function must have, see the
 %                   ChopBlas documentation.
 %                   Default: @chop
 %   * 'Summation' - The algorithm to use when performing the additions.

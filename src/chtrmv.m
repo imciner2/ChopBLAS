@@ -19,7 +19,7 @@ function [xout] = chtrmv( A, x, varargin )
 %                         value of 'Transpose' and 'LowerTriangular').
 %                         Default: false
 %   * 'Rounding'        - Function handle to the function that will perform the rounding operation.
-%                         For more information on the interface 'roundfunc' must present, see the
+%                         For more information on the interface this function must have, see the
 %                         ChopBlas documentation.
 %                         Default: @chop
 %

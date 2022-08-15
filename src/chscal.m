@@ -6,7 +6,7 @@ function [xout] = chscal( alpha, x, varargin )
 %
 % This function supports the following optional name-value arguments:
 %   * 'Rounding' - Function handle to the function that will perform the rounding operation.
-%                  For more information on the interface 'roundfunc' must present, see the
+%                  For more information on the interface this function must have, see the
 %                  ChopBlas documentation.
 %                  Default: @chop
 %
