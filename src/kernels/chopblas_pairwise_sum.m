@@ -8,20 +8,23 @@ function [s] = chopblas_pairwise_sum( x, roundfunc, opts )
 % Created on: August 8, 2022
 % SPDX-License-Identifier: BSD-2-Clause
 
-lx = length(x);
-isodd = mod( length(x), 2 );
-
-% Extract only an even number of elements, leaving one element behind if there are
-% an odd number
-s = x(1:end-isodd);
+s = x;
 
 while length(s) > 1
-    s = roundfunc( s(1:2:end-1) + s(2:2:end), opts );
-end
+    % Extract only an even number of elements to use in the sum this iteration,
+    % leaving one element behind if there are an odd number. This element
+    % is carried forward to the next iteration unchanged.
+    ls = length(s);
+    isodd = mod( ls, 2 );
 
-% The pairwise summation always saves the last element until the very end
-if isodd
-    s = roundfunc( s + x(end), opts );
+    t = zeros( ceil(ls/2), 1 );
+
+    if isodd
+        t(end) = s(end);
+    end
+
+    t(1:1:end-isodd) = roundfunc( s(1:2:(ls-1-isodd)) + s(2:2:(ls-isodd)), opts );
+    s = t;
 end
 
 end
