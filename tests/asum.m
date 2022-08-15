@@ -11,7 +11,8 @@ classdef asum < matlab.unittest.TestCase
         xint
         xdec
 
-        xodd;
+        xodd
+        xoddunsorted
 
         tol
     end
@@ -34,6 +35,8 @@ classdef asum < matlab.unittest.TestCase
             testCase.xdec = [1.0005; 2.34; 3.24; 4];
 
             testCase.xodd = [1.0005; 2.34; 3.24; 4; 5.25678];
+
+            testCase.xoddunsorted = testCase.xodd( randperm( length(testCase.xodd) ) );
 
             % Set a tolerance for all the tests
             testCase.tol = 1e-7;
@@ -100,6 +103,30 @@ classdef asum < matlab.unittest.TestCase
             z = chasum( testCase.xodd, testCase.hopts, ...
                         'Rounding', testCase.rf, ...
                         'Summation', 'pairwise' );
+            testCase.verifyEqual( z, res );
+
+            % Test sorting with increasing magnitude algorithm
+            x = abs( testCase.xodd );
+            res = x(1);
+            for i=2:1:length(x)
+                res = double( half( res + x(i) ) );
+            end
+
+            z = chasum( testCase.xoddunsorted, testCase.hopts, ...
+                        'Rounding', testCase.rf, ...
+                        'Summation', 'increasing' );
+            testCase.verifyEqual( z, res );
+
+            % Test sorting with decreasing magnitude algorithm
+            x = abs( testCase.xodd );
+            res = x(end);
+            for i=length(x)-1:-1:1
+                res = double( half( res + x(i) ) );
+            end
+
+            z = chasum( testCase.xoddunsorted, testCase.hopts, ...
+                        'Rounding', testCase.rf, ...
+                        'Summation', 'decreasing' );
             testCase.verifyEqual( z, res );
         end
 

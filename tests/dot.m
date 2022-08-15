@@ -13,7 +13,8 @@ classdef dot < matlab.unittest.TestCase
         xdec
         ydec
 
-        xodd;
+        xodd
+        xoddunsorted
 
         tol
     end
@@ -38,6 +39,8 @@ classdef dot < matlab.unittest.TestCase
             testCase.ydec = [2.00125; 3.00225; 4.00014; 5.0025];
 
             testCase.xodd = [1.0005; 2.34; 3.24; 4; 5.25678];
+
+            testCase.xoddunsorted = testCase.xodd( randperm( length(testCase.xodd) ) );
 
             % Set a tolerance for all the tests
             testCase.tol = 1e-7;
@@ -115,6 +118,30 @@ classdef dot < matlab.unittest.TestCase
             z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, ...
                        'Rounding', testCase.rf, ...
                        'Summation', 'pairwise' );
+            testCase.verifyEqual( z, res );
+
+            % Test sorting with increasing magnitude algorithm
+            x = half( testCase.xodd.*testCase.xodd );
+            res = x(1);
+            for i=2:1:length(x)
+                res = half( res + x(i) );
+            end
+
+            z = chdot( testCase.xoddunsorted, testCase.xoddunsorted, testCase.hopts, ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'increasing' );
+            testCase.verifyEqual( z, res );
+
+            % Test sorting with decreasing magnitude algorithm
+            x = half( testCase.xodd.*testCase.xodd );
+            res = x(end);
+            for i=length(x)-1:-1:1
+                res = half( res + x(i) );
+            end
+
+            z = chdot( testCase.xoddunsorted, testCase.xoddunsorted, testCase.hopts, ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'decreasing' );
             testCase.verifyEqual( z, res );
         end
 

@@ -75,9 +75,9 @@ if strcmpi( algorithm, 'recursive' )
 elseif strcmpi( algorithm, 'pairwise' )
     dot = chopblas_pairwise_sum_vec( pp, roundfunc, addopts );
 elseif strcmpi( algorithm, 'increasing' )
-    xout = chopblas_sorted_sum_vec( x, 1, roundfunc, opts );
+    dot = chopblas_sorted_sum_vec( pp, 1, roundfunc, addopts );
 elseif strcmpi( algorithm, 'decreasing' )
-    xout = chopblas_sorted_sum_vec( x, 0, roundfunc, opts );
+    dot = chopblas_sorted_sum_vec( pp, 0, roundfunc, addopts );
 else
     errmsg = strcat( "Unknown summation algorithm: ", algorithm );
     error( "chdot:unknownSummationAlgorithm", errmsg );
