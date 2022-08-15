@@ -50,7 +50,7 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.xeven );
-            z   = chopblas_pairwise_sum( testCase.xeven, testCase.rf, struct([]) );
+            z   = chopblas_pairwise_sum_vec( testCase.xeven, testCase.rf, struct([]) );
             testCase.verifyEqual( z, res );
 
             % Test with a half-precision rounding mode
@@ -59,7 +59,7 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
             i2  = double( half( x(2) + x(4) ) );
             res = double( half( i1 + i2 ) );
 
-            z = chopblas_recursive_sum( testCase.xeven, testCase.rf, testCase.hopts );
+            z = chopblas_recursive_sum_vec( testCase.xeven, testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );
         end
 
@@ -70,7 +70,7 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.xodd );
-            z   = chopblas_pairwise_sum( testCase.xodd, testCase.rf, struct([]) );
+            z   = chopblas_pairwise_sum_vec( testCase.xodd, testCase.rf, struct([]) );
             testCase.verifyEqual( z, res );
 
             % Test with a half-precision rounding mode
@@ -81,7 +81,7 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
             i3  = double( half( i1 + i2 ) );
             res = double( half( i3 + x(5) ) );
 
-            z = chopblas_pairwise_sum( testCase.xodd, testCase.rf, testCase.hopts );
+            z = chopblas_pairwise_sum_vec( testCase.xodd, testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );
         end
 
@@ -93,11 +93,11 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.xevenodd );
-            z   = chopblas_pairwise_sum( testCase.xevenodd, testCase.rf, struct([]) );
+            z   = chopblas_pairwise_sum_vec( testCase.xevenodd, testCase.rf, struct([]) );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             res = sum( testCase.xevenodd14 );
-            z   = chopblas_pairwise_sum( testCase.xevenodd14, testCase.rf, struct([]) );
+            z   = chopblas_pairwise_sum_vec( testCase.xevenodd14, testCase.rf, struct([]) );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             %% Test with a half-precision rounding mode
@@ -111,7 +111,7 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
             ii1  = double( half( i1 + i2 ) );
             res = double( half( ii1 + i3 ) );
 
-            z = chopblas_pairwise_sum( testCase.xevenodd, testCase.rf, testCase.hopts );
+            z = chopblas_pairwise_sum_vec( testCase.xevenodd, testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );
 
             x = testCase.xevenodd14;
@@ -138,7 +138,7 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
             % Final result
             res = double( half( iii1 + iii2 ) );
 
-            z = chopblas_pairwise_sum( testCase.xevenodd14, testCase.rf, testCase.hopts );
+            z = chopblas_pairwise_sum_vec( testCase.xevenodd14, testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );
         end
     end

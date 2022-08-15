@@ -59,9 +59,9 @@ end
 pp = roundfunc( x.*x, mulopts );
 
 if strcmpi( algorithm, 'recursive' )
-    dot = chopblas_recursive_sum( pp, roundfunc, addopts );
+    dot = chopblas_recursive_sum_vec( pp, roundfunc, addopts );
 elseif strcmpi( algorithm, 'pairwise' )
-    dot = chopblas_pairwise_sum( pp, roundfunc, addopts );
+    dot = chopblas_pairwise_sum_vec( pp, roundfunc, addopts );
 else
     errmsg = strcat( "Unknown summation algorithm: ", algorithm );
     error( "chnrm2:unknownSummationAlgorithm", errmsg );

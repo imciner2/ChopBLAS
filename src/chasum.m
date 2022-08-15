@@ -39,9 +39,9 @@ algorithm = p.Results.Summation;
 x = abs( x );
 
 if strcmpi( algorithm, 'recursive' )
-    xout = chopblas_recursive_sum( x, roundfunc, opts );
+    xout = chopblas_recursive_sum_vec( x, roundfunc, opts );
 elseif strcmpi( algorithm, 'pairwise' )
-    xout = chopblas_pairwise_sum( x, roundfunc, opts );
+    xout = chopblas_pairwise_sum_vec( x, roundfunc, opts );
 else
     errmsg = strcat( "Unknown summation algorithm: ", algorithm );
     error( "chasum:unknownSummationAlgorithm", errmsg );

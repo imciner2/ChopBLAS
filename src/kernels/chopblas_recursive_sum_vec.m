@@ -1,4 +1,4 @@
-function [s] = chopblas_recursive_sum( x, roundfunc, opts )
+function [s] = chopblas_recursive_sum_vec( x, roundfunc, opts )
 %CHOPBLAS_RECURSIVE_SUM Reduce a vector to a scalar with operation-level rounding
 %
 % Reduce a vector to a scalar by adding all the entries in a recursive fasion, with
