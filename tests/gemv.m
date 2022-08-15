@@ -181,11 +181,7 @@ classdef gemv < matlab.unittest.TestCase
             chop( [], testCase.dopts );
 
             xodd = [1.0005; 2.34; 3.24; 4; 5.25678];
-            Aodd = [xodd';
-                    xodd';
-                    xodd';
-                    xodd';
-                    xodd'];
+            Aodd = repmat( xodd', 5, 1 );
 
             z = chgemv( 1.0, Aodd, xodd, 0, [], ...
                        'Rounding', testCase.rf, ...
@@ -222,6 +218,37 @@ classdef gemv < matlab.unittest.TestCase
             z = chgemv( 1.0, Aodd, xodd, 0, [], testCase.hopts, ...
                        'Rounding', testCase.rf, ...
                        'Summation', 'pairwise' );
+            testCase.verifyEqual( z, res );
+
+            xoddunsorted = xodd( randperm( length(xodd) ) );
+            Aoddunsorted = repmat( xoddunsorted', 5, 1 );
+
+            % Test sorted increasing algorithm
+            x   = double( half( Aodd.*Aodd ) );
+            res = zeros(length(x), 1);
+            for i=1:1:length(x)
+                for j=1:1:length(x)
+                    res(i) = double( half( res(i) + x(i,j) ) );
+                end
+            end
+
+            z = chgemv( 1.0, Aoddunsorted, xoddunsorted, 0, [], testCase.hopts, ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'increasing' );
+            testCase.verifyEqual( z, res );
+
+            % Test sorted decreasing algorithm
+            x   = double( half( Aodd.*Aodd ) );
+            res = zeros(length(x), 1);
+            for i=1:1:length(x)
+                for j=length(x):-1:1
+                    res(i) = double( half( res(i) + x(i,j) ) );
+                end
+            end
+
+            z = chgemv( 1.0, Aoddunsorted, xoddunsorted, 0, [], testCase.hopts, ...
+                       'Rounding', testCase.rf, ...
+                       'Summation', 'decreasing' );
             testCase.verifyEqual( z, res );
         end
 

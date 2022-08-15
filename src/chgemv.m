@@ -156,9 +156,9 @@ for i=1:blocksize:lx
     elseif strcmpi( algorithm, 'pairwise' )
         xout(inds) = chopblas_pairwise_sum_mat( t, roundfunc, addopts );
     elseif strcmpi( algorithm, 'increasing' )
-        xout = chopblas_sorted_sum_mat( x, 1, roundfunc, opts );
+        xout = chopblas_sorted_sum_mat( t, 1, roundfunc, addopts );
     elseif strcmpi( algorithm, 'decreasing' )
-        xout = chopblas_sorted_sum_mat( x, 0, roundfunc, opts );
+        xout = chopblas_sorted_sum_mat( t, 0, roundfunc, addopts );
     else
         errmsg = strcat( "Unknown summation algorithm: ", algorithm );
         error( "chgemv:unknownSummationAlgorithm", errmsg );
