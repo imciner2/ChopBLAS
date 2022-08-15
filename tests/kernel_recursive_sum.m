@@ -86,7 +86,7 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
         end
 
         % Test with a vector with an odd number of elements
-        function odd_length(testCase)
+        function odd_length_vec(testCase)
             % Test with global rounding options
             % In double precision, this is the same value as the normal sum
             testCase.rf( [], testCase.dopts );

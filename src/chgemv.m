@@ -16,7 +16,7 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 %                   ChopBlas documentation.
 %                   Default: @chop
 %   * 'Summation' - The algorithm to use when performing the additions.
-%                   Supported algorithms: 'recursive', 'pairwise'
+%                   Supported algorithms: 'recursive', 'pairwise', 'increasing', 'decreasing'
 %                   Default: 'recursive'
 %   * 'BlockSize' - The number of rows of A to process in each internal iteration.
 %                   Default: All rows of A.
@@ -155,6 +155,10 @@ for i=1:blocksize:lx
         xout(inds) = chopblas_recursive_sum_mat( t, roundfunc, addopts );
     elseif strcmpi( algorithm, 'pairwise' )
         xout(inds) = chopblas_pairwise_sum_mat( t, roundfunc, addopts );
+    elseif strcmpi( algorithm, 'increasing' )
+        xout = chopblas_sorted_sum_mat( x, 1, roundfunc, opts );
+    elseif strcmpi( algorithm, 'decreasing' )
+        xout = chopblas_sorted_sum_mat( x, 0, roundfunc, opts );
     else
         errmsg = strcat( "Unknown summation algorithm: ", algorithm );
         error( "chgemv:unknownSummationAlgorithm", errmsg );

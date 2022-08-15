@@ -9,7 +9,7 @@ function [nrm] = chnrm2( x, varargin )
 %                   ChopBlas documentation.
 %                   Default: @chop
 %   * 'Summation' - The algorithm to use when performing the additions.
-%                   Supported algorithms: 'recursive', 'pairwise'
+%                   Supported algorithms: 'recursive', 'pairwise', 'increasing', 'decreasing'
 %                   Default: 'recursive'
 %
 % Two configurations for rounding are supported:
@@ -62,6 +62,10 @@ if strcmpi( algorithm, 'recursive' )
     dot = chopblas_recursive_sum_vec( pp, roundfunc, addopts );
 elseif strcmpi( algorithm, 'pairwise' )
     dot = chopblas_pairwise_sum_vec( pp, roundfunc, addopts );
+elseif strcmpi( algorithm, 'increasing' )
+    xout = chopblas_sorted_sum_vec( x, 1, roundfunc, opts );
+elseif strcmpi( algorithm, 'decreasing' )
+    xout = chopblas_sorted_sum_vec( x, 0, roundfunc, opts );
 else
     errmsg = strcat( "Unknown summation algorithm: ", algorithm );
     error( "chnrm2:unknownSummationAlgorithm", errmsg );

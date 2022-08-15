@@ -12,7 +12,7 @@ function [xout] = chasum( x, varargin )
 %                   ChopBlas documentation.
 %                   Default: @chop
 %   * 'Summation' - The algorithm to use when performing the additions.
-%                   Supported algorithms: 'recursive', 'pairwise'
+%                   Supported algorithms: 'recursive', 'pairwise', 'increasing', 'decreasing'
 %                   Default: 'recursive'
 %
 % Usage:
@@ -42,6 +42,10 @@ if strcmpi( algorithm, 'recursive' )
     xout = chopblas_recursive_sum_vec( x, roundfunc, opts );
 elseif strcmpi( algorithm, 'pairwise' )
     xout = chopblas_pairwise_sum_vec( x, roundfunc, opts );
+elseif strcmpi( algorithm, 'increasing' )
+    xout = chopblas_sorted_sum_vec( x, 1, roundfunc, opts );
+elseif strcmpi( algorithm, 'decreasing' )
+    xout = chopblas_sorted_sum_vec( x, 0, roundfunc, opts );
 else
     errmsg = strcat( "Unknown summation algorithm: ", algorithm );
     error( "chasum:unknownSummationAlgorithm", errmsg );
