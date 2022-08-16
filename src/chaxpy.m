@@ -23,8 +23,8 @@ function [xout] = chaxpy( alpha, x, y, varargin )
 %
 % Usage:
 %   [xout] = CHAXPY( alpha, x, y, ... )
-%   [xout] = CHAXPY( alpha, x, opts, ... )
-%   [xout] = CHAXPY( alpha, x, mulopts, addopts, ... )
+%   [xout] = CHAXPY( alpha, x, y, opts, ... )
+%   [xout] = CHAXPY( alpha, x, y, mulopts, addopts, ... )
 
 % Created by: Ian McInerney
 % Created on: June 15, 2022
