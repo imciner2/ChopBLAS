@@ -26,6 +26,7 @@ This allows for the easy simulation of linear algebra operations/algorithms in l
 | chgemv   | $x_{out} = \alpha A x + \beta y$ or $x_{out} = \alpha A' x + \beta y$ | Compute the matrix-vector product $Ax + y$                             |
 | chtrmv   | $x_{out} = A x$ or $x_{out} = A' x$                                   | Compute the matrix-vector product $Ax$ when $A$ is a triangular matrix      |
 | chtrsv   | Find $x$ in $A x = b$ or $A' x = b$                                   | Compute the solution to the triangular system of equations given by $A$ and $b$ when $A$ is a triangular matrix |
+| chger    | $X = \alpha x y^{T} + A$                                              | Compute the rank-1 update of $A$ using the outer product between $x$ and $y$ |
 
 ## License
 
