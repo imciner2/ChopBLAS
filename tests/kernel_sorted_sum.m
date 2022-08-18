@@ -55,8 +55,18 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
             testCase.Xoddsorted  = repmat( testCase.xoddsorted', 5, 1 );
             testCase.Xevensorted = repmat( testCase.xevensorted', 4, 1 );
 
-            testCase.Xodd  = testCase.Xoddsorted( :, randperm( length(testCase.Xoddsorted) ) );
-            testCase.Xeven = testCase.Xevensorted( :, randperm( length(testCase.Xevensorted) ) );
+            % Randomly permute the order of the elements in each row of the matrices
+            % Each row should be ordered differently so that we can ensure they get
+            % sorted properly
+            [nr, nc] = size( testCase.Xoddsorted );
+            for i = 1:1:nr
+                testCase.Xodd(i,:) = testCase.Xoddsorted( i, randperm( nc ) );
+            end
+
+            [nr, nc] = size( testCase.Xevensorted );
+            for i = 1:1:nr
+                testCase.Xeven(i,:) = testCase.Xevensorted( i, randperm( nc ) );
+            end
 
             % Set a tolerance for all the tests
             testCase.tol = 1e-4;
