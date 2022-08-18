@@ -189,7 +189,7 @@ classdef gemv < matlab.unittest.TestCase
             testCase.verifyEqual( z, Aodd*xodd, 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
-            testCase.verifyError( @() chgemv( 1.0, Aodd, xodd, 0, [], 'Summation', 'random' ), "chgemv:unknownSummationAlgorithm" );
+            testCase.verifyError( @() chgemv( 1.0, Aodd, xodd, 0, [], 'Summation', 'random' ), "chopblas:unknownSummationAlgorithm" );
 
             % Test with recursive algorithm
             x   = double( half( Aodd.*Aodd ) );
