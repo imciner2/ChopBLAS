@@ -23,6 +23,13 @@ classdef kernel_pairwise_sum < matlab.unittest.TestCase
 
     methods(TestMethodSetup)
         function setup_test(testCase)
+            % Ensure the kernels are on the path (they are private to the source code)
+            % We can't use the PathFixture here, because it is private so MATLAB prevents
+            % adding it to the path. Instead change the folder to the private folder with
+            % the kernels in it.
+            import matlab.unittest.fixtures.CurrentFolderFixture
+            testCase.applyFixture( CurrentFolderFixture( ["../src/private"] ) );
+
             testCase.sopts.format = 's';
             testCase.hopts.format = 'h';
             testCase.dopts.format = 'd';
