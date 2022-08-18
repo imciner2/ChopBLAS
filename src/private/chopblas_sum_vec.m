@@ -17,6 +17,8 @@ elseif strcmpi( algorithm, 'increasing' )
     xout = chopblas_sorted_sum_vec( x, 1, roundfunc, opts );
 elseif strcmpi( algorithm, 'decreasing' )
     xout = chopblas_sorted_sum_vec( x, 0, roundfunc, opts );
+elseif strcmpi( algorithm, 'insertion' )
+    xout = chopblas_insertion_sum_vec( x, 1, roundfunc, opts );
 else
     errmsg = strcat( "Unknown summation algorithm: ", algorithm );
     error( "chopblas:unknownSummationAlgorithm", errmsg );
