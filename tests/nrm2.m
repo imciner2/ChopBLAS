@@ -79,7 +79,7 @@ classdef nrm2 < matlab.unittest.TestCase
             testCase.verifyEqual( z, sqrt( testCase.xodd'*testCase.xodd ), 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
-            testCase.verifyError( @() chnrm2( [2, 3, 5], 'Summation', 'random' ), "chnrm2:unknownSummationAlgorithm" );
+            testCase.verifyError( @() chnrm2( [2, 3, 5], 'Summation', 'random' ), "chopblas:unknownSummationAlgorithm" );
 
             % Test with recursive algorithm
             x = half( testCase.xodd.*testCase.xodd );

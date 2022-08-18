@@ -97,7 +97,7 @@ classdef dot < matlab.unittest.TestCase
             testCase.verifyEqual( z, testCase.xodd'*testCase.xodd, 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
-            testCase.verifyError( @() chdot( [2, 3, 5], [3, 4, 5], 'Summation', 'random' ), "chdot:unknownSummationAlgorithm" );
+            testCase.verifyError( @() chdot( [2, 3, 5], [3, 4, 5], 'Summation', 'random' ), "chopblas:unknownSummationAlgorithm" );
 
             % Test with recursive algorithm
             x = half( testCase.xodd.*testCase.xodd );

@@ -10,7 +10,6 @@ function [dot] = chdot( x, y, varargin )
 %                   ChopBlas documentation.
 %                   Default: @chop
 %   * 'Summation' - The algorithm to use when performing the additions.
-%                   Supported algorithms: 'recursive', 'pairwise', 'increasing', 'decreasing'
 %                   Default: 'recursive'
 %
 % Two configurations for rounding are supported:
@@ -70,17 +69,6 @@ else
     error( "chdot:xyMustBeCompatibleSize", errmsg );
 end
 
-if strcmpi( algorithm, 'recursive' )
-    dot = chopblas_recursive_sum_vec( pp, roundfunc, addopts );
-elseif strcmpi( algorithm, 'pairwise' )
-    dot = chopblas_pairwise_sum_vec( pp, roundfunc, addopts );
-elseif strcmpi( algorithm, 'increasing' )
-    dot = chopblas_sorted_sum_vec( pp, 1, roundfunc, addopts );
-elseif strcmpi( algorithm, 'decreasing' )
-    dot = chopblas_sorted_sum_vec( pp, 0, roundfunc, addopts );
-else
-    errmsg = strcat( "Unknown summation algorithm: ", algorithm );
-    error( "chdot:unknownSummationAlgorithm", errmsg );
-end
+dot = chopblas_sum_vec( pp, algorithm, roundfunc, addopts );
 
 end

@@ -79,7 +79,7 @@ classdef asum < matlab.unittest.TestCase
             testCase.verifyEqual( z, sum( abs( testCase.xodd ) ), 'AbsTol', testCase.tol );
 
             % Test with an unknown algorithm specified
-            testCase.verifyError( @() chasum( [2, 3, 5], 'Summation', 'random' ), "chasum:unknownSummationAlgorithm" );
+            testCase.verifyError( @() chasum( [2, 3, 5], 'Summation', 'random' ), "chopblas:unknownSummationAlgorithm" );
 
             % Test with recursive algorithm
             x = abs( testCase.xodd );
