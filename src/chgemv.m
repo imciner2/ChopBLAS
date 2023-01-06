@@ -19,6 +19,9 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 %                   Default: 'recursive'
 %   * 'BlockSize' - The number of rows of A to process in each internal iteration.
 %                   Default: All rows of A.
+%   * 'yLocation' - Which location to place y when doing the additions.
+%                   Possible values: 'start' or 'end'
+%                   Default: 'start'
 %
 % The order of operations for this function are as follows:
 %   1) Populate xout with the y vector
@@ -68,6 +71,7 @@ addParameter( p, 'Transpose', false, isboolean );
 addParameter( p, 'Rounding', @chop );
 addParameter( p, 'Summation', 'recursive' );
 addParameter( p, 'BlockSize', size(A,1) );
+addParameter( p, 'yLocation', 'start' );
 
 parse( p, varargin{:} )
 
@@ -77,6 +81,7 @@ trans     = p.Results.Transpose;
 roundfunc = p.Results.Rounding;
 algorithm = p.Results.Summation;
 blocksize = p.Results.BlockSize;
+yLocation = p.Results.yLocation;
 
 % Allow only the first to be specified and have it be used for both
 if isempty(addopts) && ~isempty(mulopts)
@@ -116,6 +121,13 @@ if blocksize < 1
     blocksize = 1;
 end
 
+if strcmpi( yLocation, 'start' )
+    yPos = 0;
+elseif strcmpi( yLocation, 'end' )
+    yPos = 1;
+else
+    error( "chgemv:UnknownyLocation", "Given position for y is not support" );
+end
 
 % Initialize output using scaled y vector
 if ( beta == 1 ) && ( ~isempty(y) )
@@ -148,7 +160,13 @@ for i=1:blocksize:lx
 
     % matind() will return a column vector of the matrix elements in the proper position
     % for the final add (based on the transpose option)
-    t = [xout(inds), roundfunc( matind(inds).*x', mulopts )];
+    if yPos
+        % Add y last in the vector
+        t = [roundfunc( matind(inds).*x', mulopts ), xout(inds)];
+    else
+        % Add y first in the vector
+        t = [xout(inds), roundfunc( matind(inds).*x', mulopts )];
+    end
 
     xout(inds) = chopblas_sum_mat( t, algorithm, roundfunc, addopts );
 end
