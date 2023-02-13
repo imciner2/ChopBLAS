@@ -93,11 +93,8 @@ classdef dot < matlab.unittest.TestCase
 
             z = chdot( testCase.xodd, testCase.xodd, ...
                        'Rounding', testCase.rf, ...
-                       'Summation', 'recursive' );
+                       'Accumulator', @chaccum_recursive );
             testCase.verifyEqual( z, testCase.xodd'*testCase.xodd, 'AbsTol', testCase.tol );
-
-            % Test with an unknown algorithm specified
-            testCase.verifyError( @() chdot( [2, 3, 5], [3, 4, 5], 'Summation', 'random' ), "chopblas:unknownSummationAlgorithm" );
 
             % Test with recursive algorithm
             x = half( testCase.xodd.*testCase.xodd );
@@ -108,7 +105,7 @@ classdef dot < matlab.unittest.TestCase
 
             z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, ...
                        'Rounding', testCase.rf, ...
-                       'Summation', 'recursive' );
+                       'Accumulator', @chaccum_recursive );
             testCase.verifyEqual( z, res );
 
             % Test with pairwise algorithm
@@ -117,7 +114,7 @@ classdef dot < matlab.unittest.TestCase
 
             z = chdot( testCase.xodd, testCase.xodd, testCase.hopts, ...
                        'Rounding', testCase.rf, ...
-                       'Summation', 'pairwise' );
+                       'Accumulator', @chaccum_pairwise );
             testCase.verifyEqual( z, res );
 
             % Test sorting with increasing magnitude algorithm
@@ -129,7 +126,7 @@ classdef dot < matlab.unittest.TestCase
 
             z = chdot( testCase.xoddunsorted, testCase.xoddunsorted, testCase.hopts, ...
                        'Rounding', testCase.rf, ...
-                       'Summation', 'increasing' );
+                       'Accumulator', @(x, func, opts) chaccum_sorted(x, func, opts, 'ascend' ) );
             testCase.verifyEqual( z, res );
 
             % Test sorting with decreasing magnitude algorithm
@@ -141,7 +138,7 @@ classdef dot < matlab.unittest.TestCase
 
             z = chdot( testCase.xoddunsorted, testCase.xoddunsorted, testCase.hopts, ...
                        'Rounding', testCase.rf, ...
-                       'Summation', 'decreasing' );
+                       'Accumulator', @(x, func, opts) chaccum_sorted(x, func, opts, 'descend' ) );
             testCase.verifyEqual( z, res );
         end
 

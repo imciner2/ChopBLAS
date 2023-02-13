@@ -5,12 +5,12 @@ function [dot] = chdot( x, y, varargin )
 % of each operation.
 %
 % This function supports the following optional name-value arguments:
-%   * 'Rounding'  - Function handle to the function that will perform the rounding operation.
-%                   For more information on the interface this function must have, see the
-%                   ChopBlas documentation.
-%                   Default: @chop
-%   * 'Summation' - The algorithm to use when performing the additions.
-%                   Default: 'recursive'
+%   * 'Rounding'    - Function handle to the function that will perform the rounding operation.
+%                     For more information on the interface this function must have, see the
+%                     ChopBlas documentation.
+%                     Default: @chop
+%   * 'Accumulator' - The algorithm to use when performing the additions.
+%                     Default: @chaccum_recursive
 %
 % Two configurations for rounding are supported:
 %   * One rounding mode.
@@ -38,14 +38,14 @@ p.StructExpand = false;
 addOptional( p, 'mulopts', struct([]) );
 addOptional( p, 'addopts', struct([]) );
 addParameter( p, 'Rounding', @chop );
-addParameter( p, 'Summation', 'recursive' );
+addParameter( p, 'Accumulator', @chaccum_recursive );
 
 parse( p, varargin{:} )
 
+accum     = p.Results.Accumulator;
 mulopts   = p.Results.mulopts;
 addopts   = p.Results.addopts;
 roundfunc = p.Results.Rounding;
-algorithm = p.Results.Summation;
 
 % Allow only the first to be specified and have it be used for both
 if isempty(addopts) && ~isempty(mulopts)
@@ -69,6 +69,6 @@ else
     error( "chdot:xyMustBeCompatibleSize", errmsg );
 end
 
-dot = chopblas_sum_vec( pp, algorithm, roundfunc, addopts );
+dot = accum( pp, roundfunc, addopts );
 
 end

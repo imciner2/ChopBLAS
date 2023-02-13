@@ -1,5 +1,5 @@
-classdef kernel_recursive_sum < matlab.unittest.TestCase
-%KERNEL_RECURSIVE_SUM Test for the recursive summation compute kernel
+classdef accumulate_recursive < matlab.unittest.TestCase
+%ACCUMULATE_RECURSIVE Test for the recursive accumulation compute kernel
 
     properties
         sopts
@@ -19,12 +19,9 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
 
     methods(TestMethodSetup)
         function setup_test(testCase)
-            % Ensure the kernels are on the path (they are private to the source code)
-            % We can't use the PathFixture here, because it is private so MATLAB prevents
-            % adding it to the path. Instead change the folder to the private folder with
-            % the kernels in it.
-            import matlab.unittest.fixtures.CurrentFolderFixture
-            testCase.applyFixture( CurrentFolderFixture( ["../src/private"] ) );
+            % Ensure the kernels are on the path
+%            import matlab.unittest.fixtures.PathFixture
+%            testCase.applyFixture( PathFixture( ["../src/accumulate"] ) );
 
             testCase.sopts.format = 's';
             testCase.hopts.format = 'h';
@@ -52,14 +49,14 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
     end
 
     methods(Test)
-        % Test with a vector with an even number of elements
-        function even_length_vec(testCase)
+        % Test with a column vector with an even number of elements
+        function even_length_vec_column(testCase)
             % Test with global rounding options
             % In double precision, this is the same value as the normal sum
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.xeven );
-            z   = chopblas_recursive_sum_vec( testCase.xeven, testCase.rf, struct([]) );
+            z   = chaccum_recursive( testCase.xeven, testCase.rf, struct([]) );
             testCase.verifyEqual( z, res );
 
             % Test with a half-precision rounding mode
@@ -68,7 +65,27 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
                 res = double( half( res + testCase.xeven(i) ) );
             end
 
-            z = chopblas_recursive_sum_vec( testCase.xeven, testCase.rf, testCase.hopts );
+            z = chaccum_recursive( testCase.xeven, testCase.rf, testCase.hopts );
+            testCase.verifyEqual( z, res );
+        end
+
+        % Test with a row vector with an even number of elements
+        function even_length_vec_row(testCase)
+            % Test with global rounding options
+            % In double precision, this is the same value as the normal sum
+            testCase.rf( [], testCase.dopts );
+
+            res = sum( testCase.xeven );
+            z   = chaccum_recursive( testCase.xeven', testCase.rf, struct([]) );
+            testCase.verifyEqual( z, res );
+
+            % Test with a half-precision rounding mode
+            res = testCase.xeven(1);
+            for i=2:1:length(testCase.xeven)
+                res = double( half( res + testCase.xeven(i) ) );
+            end
+
+            z = chaccum_recursive( testCase.xeven', testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );
         end
 
@@ -79,7 +96,7 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.Xeven, 2 );
-            z   = chopblas_recursive_sum_mat( testCase.Xeven, testCase.rf, struct([]) );
+            z   = chaccum_recursive( testCase.Xeven, testCase.rf, struct([]) );
             testCase.verifyEqual( z, res );
 
             % Test with a half-precision rounding mode
@@ -88,18 +105,18 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
                 res = double( half( res + testCase.Xeven(:,i) ) );
             end
 
-            z = chopblas_recursive_sum_mat( testCase.Xeven, testCase.rf, testCase.hopts );
+            z = chaccum_recursive( testCase.Xeven, testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );
         end
 
-        % Test with a vector with an odd number of elements
-        function odd_length_vec(testCase)
+        % Test with a column vector with an odd number of elements
+        function odd_length_column_vec(testCase)
             % Test with global rounding options
             % In double precision, this is the same value as the normal sum
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.xodd );
-            z   = chopblas_recursive_sum_vec( testCase.xodd, testCase.rf, struct([]) );
+            z   = chaccum_recursive( testCase.xodd, testCase.rf, struct([]) );
             testCase.verifyEqual( z, res );
 
             % Test with a half-precision rounding mode
@@ -108,7 +125,27 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
                 res = double( half( res + testCase.xodd(i) ) );
             end
 
-            z = chopblas_recursive_sum_vec( testCase.xodd, testCase.rf, testCase.hopts );
+            z = chaccum_recursive( testCase.xodd, testCase.rf, testCase.hopts );
+            testCase.verifyEqual( z, res );
+        end
+
+        % Test with a row vector with an odd number of elements
+        function odd_length_row_vec(testCase)
+            % Test with global rounding options
+            % In double precision, this is the same value as the normal sum
+            testCase.rf( [], testCase.dopts );
+
+            res = sum( testCase.xodd );
+            z   = chaccum_recursive( testCase.xodd', testCase.rf, struct([]) );
+            testCase.verifyEqual( z, res );
+
+            % Test with a half-precision rounding mode
+            res = testCase.xodd(1);
+            for i=2:1:length(testCase.xodd)
+                res = double( half( res + testCase.xodd(i) ) );
+            end
+
+            z = chaccum_recursive( testCase.xodd', testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );
         end
 
@@ -119,7 +156,7 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.Xodd, 2 );
-            z   = chopblas_recursive_sum_mat( testCase.Xodd, testCase.rf, struct([]) );
+            z   = chaccum_recursive( testCase.Xodd, testCase.rf, struct([]) );
             testCase.verifyEqual( z, res );
 
             % Test with a half-precision rounding mode
@@ -128,7 +165,7 @@ classdef kernel_recursive_sum < matlab.unittest.TestCase
                 res = double( half( res + testCase.Xodd(:,i) ) );
             end
 
-            z = chopblas_recursive_sum_mat( testCase.Xodd, testCase.rf, testCase.hopts );
+            z = chaccum_recursive( testCase.Xodd, testCase.rf, testCase.hopts );
             testCase.verifyEqual( z, res );
         end
     end

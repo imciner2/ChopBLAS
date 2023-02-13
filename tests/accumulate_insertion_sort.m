@@ -1,5 +1,5 @@
-classdef kernel_insertion_sum < matlab.unittest.TestCase
-%KERNEL_INSERTION_SUM Test for the insertion summation compute kernel
+classdef accumulate_insertion_sort < matlab.unittest.TestCase
+%accumulate_insertion_sort Test for the insertion sort accumulation compute kernel
 
     properties
         sopts
@@ -19,13 +19,6 @@ classdef kernel_insertion_sum < matlab.unittest.TestCase
 
     methods(TestMethodSetup)
         function setup_test(testCase)
-            % Ensure the kernels are on the path (they are private to the source code)
-            % We can't use the PathFixture here, because it is private so MATLAB prevents
-            % adding it to the path. Instead change the folder to the private folder with
-            % the kernels in it.
-            import matlab.unittest.fixtures.CurrentFolderFixture
-            testCase.applyFixture( CurrentFolderFixture( ["../src/private"] ) );
-
             testCase.sopts.format = 's';
             testCase.hopts.format = 'h';
             testCase.dopts.format = 'd';
@@ -64,18 +57,33 @@ classdef kernel_insertion_sum < matlab.unittest.TestCase
     end
 
     methods(Test)
-        % Test with a vector with an even number of elements
-        function even_length_vec(testCase)
+        % Test with a column vector with an even number of elements
+        function even_length_column_vec(testCase)
             % Test with global rounding options
             % In double precision, this is the same value as the normal sum
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.xeven );
-            z   = chopblas_insertion_sum_vec( testCase.xeven, 1, testCase.rf, struct([]) );
+            z   = chaccum_insertion_sort( testCase.xeven, testCase.rf, struct([]), 'ascend' );
             testCase.verifyEqual( z, res );
 
             % Test with round to nearest (tie to up)
-            z = chopblas_insertion_sum_vec( testCase.xeven, 1, @(x, s) round(x), struct([]) );
+            z = chaccum_insertion_sort( testCase.xeven, @(x, s) round(x), struct([]), 'ascend' );
+            testCase.verifyEqual( z, 4.0 );
+        end
+
+        % Test with a row vector with an even number of elements
+        function even_length_row_vec(testCase)
+            % Test with global rounding options
+            % In double precision, this is the same value as the normal sum
+            testCase.rf( [], testCase.dopts );
+
+            res = sum( testCase.xeven );
+            z   = chaccum_insertion_sort( testCase.xeven', testCase.rf, struct([]), 'ascend' );
+            testCase.verifyEqual( z, res );
+
+            % Test with round to nearest (tie to up)
+            z = chaccum_insertion_sort( testCase.xeven', @(x, s) round(x), struct([]), 'ascend' );
             testCase.verifyEqual( z, 4.0 );
         end
 
@@ -86,26 +94,41 @@ classdef kernel_insertion_sum < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.Xeven, 2 );
-            z   = chopblas_insertion_sum_mat( testCase.Xeven, 1, testCase.rf, struct([]) );
+            z   = chaccum_insertion_sort( testCase.Xeven, testCase.rf, struct([]), 'ascend' );
             testCase.verifyEqual( z, res );
 
             % Test with round to nearest (tie to up)
-            z = chopblas_insertion_sum_mat( testCase.Xeven, 1, @(x, s) round(x), struct([]) );
+            z = chaccum_insertion_sort( testCase.Xeven, @(x, s) round(x), struct([]), 'ascend' );
             testCase.verifyEqual( z, 4.0*ones( size( testCase.Xeven, 1 ), 1 ) );
         end
 
-        % Test with a vector with an odd number of elements
-        function odd_length_vec(testCase)
+        % Test with a column vector with an odd number of elements
+        function odd_length_column_vec(testCase)
             % Test with global rounding options
             % In double precision, this is the same value as the normal sum
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.xodd );
-            z   = chopblas_insertion_sum_vec( testCase.xodd, 1, testCase.rf, struct([]) );
+            z   = chaccum_insertion_sort( testCase.xodd, testCase.rf, struct([]), 'ascend' );
             testCase.verifyEqual( z, res );
 
             % Test with round to nearest (tie to up)
-            z = chopblas_insertion_sum_vec( testCase.xodd, 1, @(x, s) round(x), struct([]) );
+            z = chaccum_insertion_sort( testCase.xodd, @(x, s) round(x), struct([]), 'ascend' );
+            testCase.verifyEqual( z, 3.0 );
+        end
+
+        % Test with a row vector with an odd number of elements
+        function odd_length_row_vec(testCase)
+            % Test with global rounding options
+            % In double precision, this is the same value as the normal sum
+            testCase.rf( [], testCase.dopts );
+
+            res = sum( testCase.xodd );
+            z   = chaccum_insertion_sort( testCase.xodd', testCase.rf, struct([]), 'ascend' );
+            testCase.verifyEqual( z, res );
+
+            % Test with round to nearest (tie to up)
+            z = chaccum_insertion_sort( testCase.xodd', @(x, s) round(x), struct([]), 'ascend' );
             testCase.verifyEqual( z, 3.0 );
         end
 
@@ -116,11 +139,11 @@ classdef kernel_insertion_sum < matlab.unittest.TestCase
             testCase.rf( [], testCase.dopts );
 
             res = sum( testCase.Xodd, 2 );
-            z   = chopblas_insertion_sum_mat( testCase.Xodd, 1, testCase.rf, struct([]) );
+            z   = chaccum_insertion_sort( testCase.Xodd, testCase.rf, struct([]), 'ascend' );
             testCase.verifyEqual( z, res );
 
             % Test with round to nearest (tie to up)
-            z = chopblas_insertion_sum_mat( testCase.Xodd, 1, @(x, s) round(x), struct([]) );
+            z = chaccum_insertion_sort( testCase.Xodd, @(x, s) round(x), struct([]), 'ascend' );
             testCase.verifyEqual( z, 3.0*ones( size( testCase.Xodd, 1 ), 1 ) );
         end
     end

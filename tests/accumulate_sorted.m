@@ -1,5 +1,5 @@
-classdef kernel_sorted_sum < matlab.unittest.TestCase
-%KERNEL_SORTED_SUM Test for the recursive sorted summation compute kernel
+classdef accumulate_sorted < matlab.unittest.TestCase
+%ACCUMULATE_SORTED Test for the recursive sorted accumulation compute kernel
 
     properties
         sopts
@@ -25,13 +25,6 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
 
     methods(TestMethodSetup)
         function setup_test(testCase)
-            % Ensure the kernels are on the path (they are private to the source code)
-            % We can't use the PathFixture here, because it is private so MATLAB prevents
-            % adding it to the path. Instead change the folder to the private folder with
-            % the kernels in it.
-            import matlab.unittest.fixtures.CurrentFolderFixture
-            testCase.applyFixture( CurrentFolderFixture( ["../src/private"] ) );
-
             testCase.sopts.format = 's';
             testCase.hopts.format = 'h';
             testCase.dopts.format = 'd';
@@ -74,8 +67,8 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
     end
 
     methods(Test)
-        % Test with a vector with an even number of elements
-        function even_length_vec(testCase)
+        % Test with a column vector with an even number of elements
+        function even_length_column_vec(testCase)
             % Test with global rounding options
             % In double precision, this is the same value as the normal sum
             testCase.rf( [], testCase.dopts );
@@ -83,11 +76,11 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
             res = sum( testCase.xeven );
 
             % Increasing order
-            z = chopblas_sorted_sum_vec( testCase.xeven, 1, testCase.rf, struct([]) );
+            z = chaccum_sorted( testCase.xeven, testCase.rf, struct([]), 'ascend' );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             % Decreasing order
-            z = chopblas_sorted_sum_vec( testCase.xeven, 0, testCase.rf, struct([]) );
+            z = chaccum_sorted( testCase.xeven, testCase.rf, struct([]), 'descend' );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             % Test with a half-precision rounding mode
@@ -96,7 +89,33 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
                 res = double( half( res + testCase.xevensorted(i) ) );
             end
 
-            z = chopblas_sorted_sum_vec( testCase.xeven, 1, testCase.rf, testCase.hopts );
+            z = chaccum_sorted( testCase.xeven, testCase.rf, testCase.hopts, 'ascend' );
+            testCase.verifyEqual( z, res );
+        end
+
+        % Test with a row vector with an even number of elements
+        function even_length_row_vec(testCase)
+            % Test with global rounding options
+            % In double precision, this is the same value as the normal sum
+            testCase.rf( [], testCase.dopts );
+
+            res = sum( testCase.xeven );
+
+            % Increasing order
+            z = chaccum_sorted( testCase.xeven', testCase.rf, struct([]), 'ascend' );
+            testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
+
+            % Decreasing order
+            z = chaccum_sorted( testCase.xeven', testCase.rf, struct([]), 'descend' );
+            testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
+
+            % Test with a half-precision rounding mode
+            res = testCase.xevensorted(1);
+            for i=2:1:length(testCase.xevensorted)
+                res = double( half( res + testCase.xevensorted(i) ) );
+            end
+
+            z = chaccum_sorted( testCase.xeven', testCase.rf, testCase.hopts, 'ascend' );
             testCase.verifyEqual( z, res );
         end
 
@@ -109,11 +128,11 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
             res = sum( testCase.Xeven, 2 );
 
             % Increasing order
-            z = chopblas_sorted_sum_mat( testCase.Xeven, 1, testCase.rf, struct([]) );
+            z = chaccum_sorted( testCase.Xeven, testCase.rf, struct([]), 'ascend' );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             % Decreasing order
-            z = chopblas_sorted_sum_mat( testCase.Xeven, 0, testCase.rf, struct([]) );
+            z = chaccum_sorted( testCase.Xeven, testCase.rf, struct([]), 'descend' );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             % Test with a half-precision rounding mode
@@ -122,12 +141,12 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
                 res = double( half( res + testCase.Xevensorted(:,i) ) );
             end
 
-            z = chopblas_sorted_sum_mat( testCase.Xeven, 1, testCase.rf, testCase.hopts );
+            z = chaccum_sorted( testCase.Xeven, testCase.rf, testCase.hopts, 'ascend' );
             testCase.verifyEqual( z, res );
         end
 
-        % Test with a vector with an odd number of elements
-        function odd_length_vec(testCase)
+        % Test with a column vector with an odd number of elements
+        function odd_length_column_vec(testCase)
             % Test with global rounding options
             % In double precision, this is the same value as the normal sum
             testCase.rf( [], testCase.dopts );
@@ -135,11 +154,11 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
             res = sum( testCase.xodd );
 
             % Increasing order
-            z = chopblas_sorted_sum_vec( testCase.xodd, 1, testCase.rf, struct([]) );
+            z = chaccum_sorted( testCase.xodd, testCase.rf, struct([]), 'ascend' );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             % Decreasing order
-            z = chopblas_sorted_sum_vec( testCase.xodd, 0, testCase.rf, struct([]) );
+            z = chaccum_sorted( testCase.xodd, testCase.rf, struct([]), 'descend' );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             % Test with a half-precision rounding mode
@@ -148,7 +167,33 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
                 res = double( half( res + testCase.xoddsorted(i) ) );
             end
 
-            z = chopblas_sorted_sum_vec( testCase.xodd, 1, testCase.rf, testCase.hopts );
+            z = chaccum_sorted( testCase.xodd, testCase.rf, testCase.hopts, 'ascend' );
+            testCase.verifyEqual( z, res );
+        end
+
+        % Test with a row vector with an odd number of elements
+        function odd_length_row_vec(testCase)
+            % Test with global rounding options
+            % In double precision, this is the same value as the normal sum
+            testCase.rf( [], testCase.dopts );
+
+            res = sum( testCase.xodd );
+
+            % Increasing order
+            z = chaccum_sorted( testCase.xodd', testCase.rf, struct([]), 'ascend' );
+            testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
+
+            % Decreasing order
+            z = chaccum_sorted( testCase.xodd', testCase.rf, struct([]), 'descend' );
+            testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
+
+            % Test with a half-precision rounding mode
+            res = testCase.xoddsorted(1);
+            for i=2:1:length(testCase.xoddsorted)
+                res = double( half( res + testCase.xoddsorted(i) ) );
+            end
+
+            z = chaccum_sorted( testCase.xodd', testCase.rf, testCase.hopts, 'ascend' );
             testCase.verifyEqual( z, res );
         end
 
@@ -161,11 +206,11 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
             res = sum( testCase.Xodd, 2 );
 
             % Increasing order
-            z = chopblas_sorted_sum_mat( testCase.Xodd, 1, testCase.rf, struct([]) );
+            z = chaccum_sorted( testCase.Xodd, testCase.rf, struct([]), 'ascend' );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             % Decreasing order
-            z = chopblas_sorted_sum_mat( testCase.Xodd, 0, testCase.rf, struct([]) );
+            z = chaccum_sorted( testCase.Xodd, testCase.rf, struct([]), 'descend' );
             testCase.verifyEqual( z, res, 'AbsTol', testCase.tol );
 
             % Test with a half-precision rounding mode
@@ -174,7 +219,7 @@ classdef kernel_sorted_sum < matlab.unittest.TestCase
                 res = double( half( res + testCase.Xoddsorted(:,i) ) );
             end
 
-            z = chopblas_sorted_sum_mat( testCase.Xodd, 1, testCase.rf, testCase.hopts );
+            z = chaccum_sorted( testCase.Xodd, testCase.rf, testCase.hopts, 'ascend' );
             testCase.verifyEqual( z, res );
         end
     end

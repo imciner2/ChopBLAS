@@ -4,12 +4,12 @@ function [nrm] = chnrm2( x, varargin )
 % Compute the 2-norm of the vector x with rounding after each operation.
 %
 % This function supports the following optional name-value arguments:
-%   * 'Rounding'  - Function handle to the function that will perform the rounding operation.
-%                   For more information on the interface this function must have, see the
-%                   ChopBlas documentation.
-%                   Default: @chop
-%   * 'Summation' - The algorithm to use when performing the additions.
-%                   Default: 'recursive'
+%   * 'Rounding'    - Function handle to the function that will perform the rounding operation.
+%                     For more information on the interface this function must have, see the
+%                     ChopBlas documentation.
+%                     Default: @chop
+%   * 'Accumulator' - The algorithm to use when performing the additions.
+%                     Default: @chaccum_recursive
 %
 % Two configurations for rounding are supported:
 %   * One rounding mode.
@@ -39,15 +39,15 @@ addOptional( p, 'mulopts', struct([]) );
 addOptional( p, 'addopts', struct([]) );
 addOptional( p, 'sqrtopts', struct([]) );
 addParameter( p, 'Rounding', @chop );
-addParameter( p, 'Summation', 'recursive' );
+addParameter( p, 'Accumulator', @chaccum_recursive );
 
 parse( p, varargin{:} )
 
+accum     = p.Results.Accumulator;
 mulopts   = p.Results.mulopts;
 addopts   = p.Results.addopts;
 sqrtopts  = p.Results.sqrtopts;
 roundfunc = p.Results.Rounding;
-algorithm = p.Results.Summation;
 
 % Allow only the first to be specified and have it be used for both
 if ( isempty(addopts) || isempty(sqrtopts) ) && ~isempty(mulopts)
@@ -57,7 +57,7 @@ end
 
 pp = roundfunc( x.*x, mulopts );
 
-dot = chopblas_sum_vec( pp, algorithm, roundfunc, addopts );
+dot = accum( pp, roundfunc, addopts );
 
 nrm = roundfunc( sqrt( dot ), sqrtopts );
 

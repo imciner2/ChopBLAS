@@ -9,16 +9,16 @@ function [xout] = chgemv( alpha, A, x, beta, y, varargin )
 % If beta is zero or y is empty, then the addition with y is not performed.
 %
 % This function supports the following optional name-value arguments
-%   * 'Transpose' - If true, the computation is A'*x instead of A*x
-%                   Default: false
-%   * 'Rounding'  - Function handle to the function that will perform the rounding operation.
-%                   For more information on the interface this function must have, see the
-%                   ChopBlas documentation.
-%                   Default: @chop
-%   * 'Summation' - The algorithm to use when performing the additions.
-%                   Default: 'recursive'
-%   * 'BlockSize' - The number of rows of A to process in each internal iteration.
-%                   Default: All rows of A.
+%   * 'Transpose'   - If true, the computation is A'*x instead of A*x
+%                     Default: false
+%   * 'Rounding'    - Function handle to the function that will perform the rounding operation.
+%                     For more information on the interface this function must have, see the
+%                     ChopBlas documentation.
+%                     Default: @chop
+%   * 'Accumulator' - The algorithm to use when performing the additions.
+%                     Default: @chaccum_recursive
+%   * 'BlockSize'   - The number of rows of A to process in each internal iteration.
+%                     Default: All rows of A.
 %
 % The order of operations for this function are as follows:
 %   1) Populate xout with the y vector
@@ -66,7 +66,7 @@ addOptional( p, 'mulopts', struct([]) );
 addOptional( p, 'addopts', struct([]) );
 addParameter( p, 'Transpose', false, isboolean );
 addParameter( p, 'Rounding', @chop );
-addParameter( p, 'Summation', 'recursive' );
+addParameter( p, 'Accumulator', @chaccum_recursive );
 addParameter( p, 'BlockSize', size(A,1) );
 
 parse( p, varargin{:} )
@@ -75,7 +75,7 @@ mulopts   = p.Results.mulopts;
 addopts   = p.Results.addopts;
 trans     = p.Results.Transpose;
 roundfunc = p.Results.Rounding;
-algorithm = p.Results.Summation;
+accum = p.Results.Accumulator;
 blocksize = p.Results.BlockSize;
 
 % Allow only the first to be specified and have it be used for both
@@ -150,7 +150,7 @@ for i=1:blocksize:lx
     % for the final add (based on the transpose option)
     t = [xout(inds), roundfunc( matind(inds).*x', mulopts )];
 
-    xout(inds) = chopblas_sum_mat( t, algorithm, roundfunc, addopts );
+    xout(inds) = accum( t, roundfunc, addopts );
 end
 
 end

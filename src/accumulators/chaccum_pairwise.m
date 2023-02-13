@@ -1,5 +1,5 @@
-function [s] = chopblas_pairwise_sum_mat( x, roundfunc, opts )
-%CHOPBLAS_PAIRWISE_SUM_MAT Reduce the rows of a matrix to a vector with operation-level rounding
+function [s] = chaccum_pairwise( x, roundfunc, opts )
+%CHACCUM_PAIRWISE Accumulate into a column vector using pairwise addition with element level rounding
 %
 % Reduce a matrix to a vector by adding all the entries in a row together
 % in a pairwise fasion, with rounding after each operation.
@@ -8,7 +8,15 @@ function [s] = chopblas_pairwise_sum_mat( x, roundfunc, opts )
 % Created on: August 15, 2022
 % SPDX-License-Identifier: BSD-2-Clause
 
-s = x;
+% It is much easier to work with a row vector (since we work with row matrices), and since
+% we already need a copy of the vector, just transpose a column vector to a row vector for
+% QOL.
+if iscolumn( x )
+    s = x';
+else
+    s = x;
+end
+
 nr = size(s, 1);
 
 while size(s, 2) > 1

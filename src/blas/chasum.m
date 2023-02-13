@@ -7,12 +7,12 @@ function [xout] = chasum( x, varargin )
 % options will be used.
 %
 % This function supports the following optional name-value arguments:
-%   * 'Rounding'  - Function handle to the function that will perform the rounding operation.
-%                   For more information on the interface this function must have, see the
-%                   ChopBlas documentation.
-%                   Default: @chop
-%   * 'Summation' - The algorithm to use when performing the additions.
-%                   Default: 'recursive'
+%   * 'Rounding'    - Function handle to the function that will perform the rounding operation.
+%                     For more information on the interface this function must have, see the
+%                     ChopBlas documentation.
+%                     Default: @chop
+%   * 'Accumulator' - The algorithm to use when performing the additions.
+%                     Default: @chaccum_recursive
 %
 % Usage:
 %   [xout] = CHASUM( x, ... )
@@ -27,16 +27,16 @@ p = inputParser;
 p.StructExpand = false;
 addOptional( p, 'opts', struct([]) );
 addParameter( p, 'Rounding', @chop );
-addParameter( p, 'Summation', 'recursive' );
+addParameter( p, 'Accumulator', @chaccum_recursive );
 
 parse( p, varargin{:} )
 
 opts      = p.Results.opts;
+accum     = p.Results.Accumulator;
 roundfunc = p.Results.Rounding;
-algorithm = p.Results.Summation;
 
 x = abs( x );
 
-xout = chopblas_sum_vec( x, algorithm, roundfunc, opts );
+xout = accum( x, roundfunc, opts );
 
 end
