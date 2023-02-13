@@ -220,8 +220,10 @@ classdef gemv < matlab.unittest.TestCase
             xoddunsorted = xodd( randperm( length(xodd) ) );
             Aoddunsorted = repmat( xoddunsorted', 5, 1 );
 
-            % Test sorted increasing algorithm
-            x   = double( half( Aodd.*Aodd ) );
+            % Test sorted decreasing algorithm
+            x = double( half( Aodd.*Aodd ) );
+            x = sort(x, 2, 'descend', 'ComparisonMethod', 'abs');
+
             res = zeros(length(x), 1);
             for i=1:1:length(x)
                 for j=1:1:length(x)
@@ -234,11 +236,13 @@ classdef gemv < matlab.unittest.TestCase
                        'Accumulator', @(x, func, opts) chaccum_sorted(x, func, opts, 'descend') );
             testCase.verifyEqual( z, res );
 
-            % Test sorted decreasing algorithm
-            x   = double( half( Aodd.*Aodd ) );
+            % Test sorted increasing algorithm
+            x = double( half( Aodd.*Aodd ) );
+            x = sort(x, 2, 'ascend', 'ComparisonMethod', 'abs');
+
             res = zeros(length(x), 1);
             for i=1:1:length(x)
-                for j=length(x):-1:1
+                for j=1:1:length(x)
                     res(i) = double( half( res(i) + x(i,j) ) );
                 end
             end
