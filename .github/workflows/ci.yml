@@ -9,11 +9,11 @@ jobs:
     # 1.1.0 of the action, and only provides the bare Matlab and Simulink products with no toolboxes.
     #
     # The test suite now uses the half-precision data type, which is in the Fixed Point Designer toolbox,
-    # so the test suite can't be run on the Windows or macOS shared runners currently.
+    # so the test suite can't be run on themacOS shared runners currently.
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -23,8 +23,11 @@ jobs:
         with:
           submodules: 'recursive'
 
+      # Use the v2 beta to get support for toolboxes on Windows
       - name: Install MATLAB
-        uses: matlab-actions/setup-matlab@v1
+        uses: matlab-actions/setup-matlab@v2-beta
+        with:
+          products: fixed-point_designer
 
       - name: Run tests
         uses: matlab-actions/run-tests@v1
