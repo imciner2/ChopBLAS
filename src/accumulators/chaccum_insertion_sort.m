@@ -12,23 +12,20 @@ function [s] = chaccum_insertion_sort( x, roundfunc, opts, dir )
 % Created on: August 18, 2022
 % SPDX-License-Identifier: BSD-2-Clause
 
-
-sfunc = @(x) sort(x, 2, dir, 'ComparisonMethod', 'abs');
-
 % It is much easier to work with a row vector (since we work with row matrices), and since
 % we already need a copy of the vector, just transpose a column vector to a row vector for
 % QOL.
 if iscolumn( x )
-    s = sfunc( x' );
+    s = sort( x', 2, dir, 'ComparisonMethod', 'abs' );
 else
-    s = sfunc( x );
+    s = sort( x, 2, dir, 'ComparisonMethod', 'abs' );
 end
 
 while size(s,2) > 1
     t = roundfunc( s(:,1) + s(:,2), opts );
     s = s(:,2:end);
     s(:,1) = t;
-    s = sfunc(s);
+    s = sort( s, 2, dir, 'ComparisonMethod', 'abs' );
 end
 
 end

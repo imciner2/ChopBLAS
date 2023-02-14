@@ -11,18 +11,18 @@ function [s] = chaccum_recursive( x, roundfunc, opts )
 
 % Setup the various parts that must differentiate between a column vector and row vector/matrix
 if iscolumn( x )
-    el  = @(s, i) s(i);
+    el  = @(i) x(i);
     len = length(x);
 else
-    el  = @(s, i) s(:,i);
+    el  = @(i) x(:,i);
     len = size(x, 2);
 end
 
-s = el(x, 1);
+s = el(1);
 
 % Do the actual summation
 for i=2:len
-    s = roundfunc( s + el( x, i ), opts );
+    s = roundfunc( s + el(i), opts );
 end
 
 end
